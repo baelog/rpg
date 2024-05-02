@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "map.h": "c",
+        "yaml.h": "c",
+        "types.h": "c",
+        "ground.h": "c",
+        "window.h": "c",
+        "read.h": "c"
+    }
+}

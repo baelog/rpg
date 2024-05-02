@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/rpg.dir/main.c.o CMakeFiles/rpg.dir/yaml.c.o CMakeFiles/rpg.dir/read.c.o CMakeFiles/rpg.dir/map.c.o CMakeFiles/rpg.dir/map/ground.c.o CMakeFiles/rpg.dir/map/wall.c.o -o rpg  -lcsfml-system -lcsfml-window -lcsfml-graphics -lcsfml-audio -lcsfml-network 
