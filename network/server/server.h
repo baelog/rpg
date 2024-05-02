@@ -8,17 +8,32 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
+#include "protocol/types.h"
+
 enum type {
     BROADDCAST,
     ID,
+    POSITION,
     INVENTARY,
-    ACTIONS
+    ACTIONS,
+    ERROR
 };
 
-struct resquest_s {
+struct request_s {
     int len;
     int type;
-    char *data;
-} request_t;
+    int value;
+};
+
+struct response_s {
+    int len;
+    int type;
+    Body body;
+};
+
+struct type_object_s {
+    void (*handle_request)(request_t*);
+    void (*send_response)(struct type_object* self);
+};
 
 #endif /* !SERVER_H_ */
