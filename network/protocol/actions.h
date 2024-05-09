@@ -4,14 +4,20 @@
 
 #include "types.h"
 
-struct actions_s {
+struct response_actions_s {
     int len;
     int type;
-    Body body;
-} request_t;
+    Request_body body;
+};
+
+struct request_actions_s {
+    int len;
+    int type;
+    Request_body body;
+};
 
 struct actions_object {
-    void (*handle_request)(struct actions_s*);
+    void (*handle_request)(struct request_actions_s*);
     void (*send_response)(struct action_object* self);
 };
 

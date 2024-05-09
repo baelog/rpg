@@ -6,7 +6,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <openssl/md5.h>
+#include <arpa/inet.h>
+// #include <openssl/md5.h>
+#include "server.h"
 
 #define PORT 5000  // Port for UDP communication
 #define MAXLINE 1024
@@ -70,21 +72,32 @@ void read_client(int udpfd, fd_set *rset, struct sockaddr_in *client_list[MAX_CL
 		ssize_t n = recvfrom(udpfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, &len);
 		int is_new = is_new_client(client_list, cliaddr);
 
-		if (n > 0) {
-			buffer[n] = '\0';
-			printf("Received message from client: %s\n", buffer);
+		if (n >= 0) {
+			// buffer[n] = '\0';
+			
+			// printf("Received message from client: %s\n", buffer);
 
 			// Add client address to client_list if not already added
 			if (!is_new && client_count < MAX_CLIENTS) {
 				client_list[client_count++] = new_client(cliaddr);
 			}
+			struct request_s *request = buffer;
+			char digest[MD5_DIGEST_LENGTH] = { 0 };
+			// printf("message len %d, size of all %d\n", n, sizeof(struct request_s) + sizeof(digest));
 
+			if (n == sizeof(struct request_s) + sizeof(digest)) {
+				// request->len = htons(request->len);
+				// request->type = ntohs(request->type);
+				// request->body.value = ntohs(request->body.value);
+				// printf("%d, %d\n", request->len, request->type);
+				// write(1, buffer, n);
+				cipher(buffer, sizeof(struct request_s), digest);
+				if (!strncmp(buffer + sizeof(struct request_s), digest, sizeof(digest))) {
+					write(1, "message clear\n", strlen("message clear\n"));
+				}
+			}
 			// Respond to the client with the received message
-			sendto(udpfd, buffer, n, 0, (struct sockaddr*)&cliaddr, len);
-		}
-		if (!n) {
-			remove_array_index(client_list, is_new, MAX_CLIENTS);
-			printf("je suis la pour delete les clients\n");
+			// sendto(udpfd, buffer, n, 0, (struct sockaddr*)&cliaddr, len);
 		}
 		if (n < 0) {
 			remove_array_index(client_list, is_new, MAX_CLIENTS);
