@@ -9,6 +9,9 @@
 #include <string.h>
 #include "../protocol/id.h"
 #include <arpa/inet.h>
+#include <openssl/md5.h>
+#include <unistd.h>
+
 // #include "types.h"
 
 #define PORT 5000 
@@ -61,7 +64,36 @@ int main()
 
 	sendto(sockfd, (const char*)to_send, sizeof(to_send), 
 		0, (const struct sockaddr*)&servaddr, 
-		sizeof(servaddr)); 
+		sizeof(servaddr));
+	
+	n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
+					0, (struct sockaddr*)&servaddr, 
+					&len);
+	// write(1, buffer + sizeof(struct response_id_s), sizeof(digest));
+	write(1, buffer , n);
+	
+	// printf("%d %d\n", n, sizeof(struct response_id_s));
+	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
+		printf("bad message len\n");
+		return 0;
+	}
+
+	memset(digest, 0, sizeof(digest));
+
+	write(1, buffer , sizeof(struct response_id_s));
+
+	cipher(buffer, 16, digest);
+	
+	write(1, digest, sizeof(digest));
+
+	// printf("%d \n", sizeof(struct response_id_s))
+	if (memcmp(buffer + 16, digest, sizeof(digest))) {
+		printf("message is corrupt\n");
+		return 0;
+	}
+
+	struct response_id_s *response = (struct response_id_s*)buffer;
+	printf("%d %d %d\n", response->type, response->len, response->body.id);
 	// sendto(sockfd, (const char*)digest, MD5_DIGEST_LENGTH, 
 	// 	0, (const struct sockaddr*)&servaddr, 
 	// 	sizeof(servaddr));

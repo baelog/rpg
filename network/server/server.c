@@ -7,7 +7,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
-// #include <openssl/md5.h>
 #include "server.h"
 
 #define PORT 5000  // Port for UDP communication
@@ -42,26 +41,33 @@ void remove_array_index(void *array, int index, int len)
 }
 
 
-struct sockaddr_in *new_client(struct sockaddr_in client)
+struct client *new_client(struct sockaddr_in client)
 {
+	static int client_id = 0;
+
+	struct client *new_client = malloc(sizeof(struct client));
 	struct sockaddr_in *new = malloc(sizeof(struct sockaddr_in));
 
 	memcpy(new, &client, sizeof(client));
-	return new;
+	new_client->socket = new;
+	new_client->id = client_id++;
+
+	return new_client;
 }
 
-int is_new_client(struct sockaddr_in *client_list[MAX_CLIENTS], struct sockaddr_in cliaddr)
+int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cliaddr)
 {
-	for (int i = 0; client_list[i]; i++) {
-		if (client_list[i]->sin_addr.s_addr == cliaddr.sin_addr.s_addr && 
-			client_list[i]->sin_port == cliaddr.sin_port) {
+	int i = 0;
+	for (;client_list[i]; i++) {
+		if (client_list[i]->socket->sin_addr.s_addr == cliaddr.sin_addr.s_addr && 
+			client_list[i]->socket->sin_port == cliaddr.sin_port) {
 			return i;
 		}
 	}
 	return 0;
 }
 
-void read_client(int udpfd, fd_set *rset, struct sockaddr_in *client_list[MAX_CLIENTS], int client_count)
+void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], int client_count)
 {
 	struct sockaddr_in cliaddr;
 	socklen_t len = sizeof(cliaddr);
@@ -71,33 +77,26 @@ void read_client(int udpfd, fd_set *rset, struct sockaddr_in *client_list[MAX_CL
 		memset(buffer, 0, MAXLINE);
 		ssize_t n = recvfrom(udpfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, &len);
 		int is_new = is_new_client(client_list, cliaddr);
-
+		if (!is_new && client_count >= MAX_CLIENTS)
+			return;
+		if (!is_new && client_count < MAX_CLIENTS) {
+			client_list[client_count++] = new_client(cliaddr);
+		}
 		if (n >= 0) {
-			// buffer[n] = '\0';
-			
-			// printf("Received message from client: %s\n", buffer);
-
-			// Add client address to client_list if not already added
-			if (!is_new && client_count < MAX_CLIENTS) {
-				client_list[client_count++] = new_client(cliaddr);
-			}
-			struct request_s *request = buffer;
 			char digest[MD5_DIGEST_LENGTH] = { 0 };
 			// printf("message len %d, size of all %d\n", n, sizeof(struct request_s) + sizeof(digest));
 
 			if (n == sizeof(struct request_s) + sizeof(digest)) {
-				// request->len = htons(request->len);
-				// request->type = ntohs(request->type);
-				// request->body.value = ntohs(request->body.value);
-				// printf("%d, %d\n", request->len, request->type);
-				// write(1, buffer, n);
 				cipher(buffer, sizeof(struct request_s), digest);
-				if (!strncmp(buffer + sizeof(struct request_s), digest, sizeof(digest))) {
-					write(1, "message clear\n", strlen("message clear\n"));
+				if (!memcmp(buffer + sizeof(struct request_s), digest, sizeof(digest))) {
+					struct request_s *request = buffer;
+					// write(1, "message clear\n", strlen("message clear\n"));
+					printf("message type ; %d\n", request->type);
+					struct type_object_s *request_handler = create_object[request->type](is_new);
+					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr);
+					request_handler->response(request_handler, udpfd);
 				}
 			}
-			// Respond to the client with the received message
-			// sendto(udpfd, buffer, n, 0, (struct sockaddr*)&cliaddr, len);
 		}
 		if (n < 0) {
 			remove_array_index(client_list, is_new, MAX_CLIENTS);
@@ -106,7 +105,7 @@ void read_client(int udpfd, fd_set *rset, struct sockaddr_in *client_list[MAX_CL
 	}
 }
 
-int server_loop(int udpfd, fd_set *rset, struct sockaddr_in *client_list[MAX_CLIENTS]) {
+int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]) {
 	int nready;
     struct timeval timeout;
 	int client_count = array_len((client_list));
@@ -150,7 +149,7 @@ int main() {
     int nready;
 
     // List of clients for broadcasting
-    struct sockaddr_in *client_list[MAX_CLIENTS + 1] = { NULL };
+    struct client *client_list[MAX_CLIENTS + 1] = { NULL };
     int client_count = 0;
 
     // Create UDP socket

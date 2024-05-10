@@ -43,11 +43,25 @@ struct response_s {
     Response_body body;
 };
 
+struct client {
+    int id;
+    struct sockaddr_in *socket;
+};
+
 struct type_object_s {
-    void (*handle_request)(struct request_s*);
-    void (*send_response)(struct type_object* self);
+    int client_id;
+    void (*handle)(struct type_object_s *self, struct request_s*, struct sockaddr_in*);
+    void (*response)(struct type_object_s* self, int fd);
+    void (*destroy)(struct type_object_s*);
 };
 
 int cipher(void *data, size_t size, __u_char digest[MD5_DIGEST_LENGTH]);
+
+struct type_object_s *create_id_object(int id);
+
+const struct type_object_s *(*create_object[])(int) = {
+    &create_id_object,
+    &create_id_object
+};
 
 #endif /* !SERVER_H_ */

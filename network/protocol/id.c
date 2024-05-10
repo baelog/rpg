@@ -1,6 +1,9 @@
 #include "id.h"
 #include <stdlib.h>
 #include <string.h>
+#include <openssl/md5.h>
+#include <sys/types.h>
+
 
 int new_id(void)
 {
@@ -10,31 +13,44 @@ int new_id(void)
     return id;
 }
 
-static void handle_request(struct request_id_s* request, size_t request_len)
+static void handle_request(struct id_object_s *self, struct request_id_s *request, struct sockaddr_in *client)
 {
-    __u_char md5[MD5_DIGEST_LENGTH];
-    char *ptr = request;
-    char *md;
-
-    if (request_len != sizeof(struct request_id_s) + MD5_DIGEST_LENGTH)
-        return;
-    md = ptr + sizeof(struct request_id_s);
-    cipher(request, request_len, md5);
-    if (strncmp(md, md5, MD5_DIGEST_LENGTH))
-        return;
-    printf("le message a l'aire bien recu\n");
+    self->client = client;
+    memcpy(&self->request, request, sizeof(self->request));
 }
 
-static void send_response(struct id_object* self)
+static void send_response(struct id_object_s* self, int udpfd)
 {
+    // __u_char digest[MD5_DIGEST_LENGTH];
+    struct response_id_s response;
+    memset(&response, 0, sizeof(struct response_id_s));
+    response.type = ID;
+    response.len = sizeof(response);
+    response.body.id = self->client_id;
 
+    char to_send[sizeof(response) + MD5_DIGEST_LENGTH] = {0};
+    // printf("%d %d %d \n", sizeof(to_send), );
+    
+    create_payload(to_send, &response, sizeof(response));
+
+    sendto(udpfd, to_send, sizeof(to_send), 0, 
+					(struct sockaddr*)self->client, sizeof(*self->client));
+
+    self->destroy(self);
 }
 
-type_object_t *create_id_object(void)
+static void destroy_self(struct id_object_s* self)
+{
+    free(self);
+}
+
+type_object_t *create_id_object(int id)
 {
     struct id_object_s *object = malloc(sizeof(struct id_object_s));
 
-    object->handle_request = &handle_request;
-    object->send_response = &send_response;
+    object->client_id = id;
+    object->handle = &handle_request;
+    object->response = &send_response;
+    object->destroy = &destroy_self;
     return (type_object_t*)object;
 }
