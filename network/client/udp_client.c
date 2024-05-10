@@ -44,7 +44,7 @@ int main()
 	memset(&request, 0, sizeof(struct request_id_s));
 	request.len = sizeof(struct request_id_s);
 	request.type = ID;
-	request.body.value = 32;
+	request.body.value = 0;
 
 	// request.len = htons(request.len);
 	// request.type = htons(request.type);
@@ -78,13 +78,7 @@ int main()
 		return 0;
 	}
 
-	memset(digest, 0, sizeof(digest));
-
-	write(1, buffer , sizeof(struct response_id_s));
-
 	cipher(buffer, 16, digest);
-	
-	write(1, digest, sizeof(digest));
 
 	// printf("%d \n", sizeof(struct response_id_s))
 	if (memcmp(buffer + 16, digest, sizeof(digest))) {
@@ -94,6 +88,7 @@ int main()
 
 	struct response_id_s *response = (struct response_id_s*)buffer;
 	printf("%d %d %d\n", response->type, response->len, response->body.id);
+	printf("message recieved");
 	// sendto(sockfd, (const char*)digest, MD5_DIGEST_LENGTH, 
 	// 	0, (const struct sockaddr*)&servaddr, 
 	// 	sizeof(servaddr));

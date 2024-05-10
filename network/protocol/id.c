@@ -29,9 +29,8 @@ static void send_response(struct id_object_s* self, int udpfd)
     response.body.id = self->client_id;
 
     char to_send[sizeof(response) + MD5_DIGEST_LENGTH] = {0};
-    // printf("%d %d %d \n", sizeof(to_send), );
     
-    create_payload(to_send, &response, sizeof(response));
+    create_payload(to_send, &response, 16);
 
     sendto(udpfd, to_send, sizeof(to_send), 0, 
 					(struct sockaddr*)self->client, sizeof(*self->client));

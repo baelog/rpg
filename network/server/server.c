@@ -82,6 +82,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 		if (!is_new && client_count < MAX_CLIENTS) {
 			client_list[client_count++] = new_client(cliaddr);
 		}
+		write(1, buffer, n);
 		if (n >= 0) {
 			char digest[MD5_DIGEST_LENGTH] = { 0 };
 			// printf("message len %d, size of all %d\n", n, sizeof(struct request_s) + sizeof(digest));
