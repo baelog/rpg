@@ -57,9 +57,9 @@ struct type_object_s {
 
 int cipher(void *data, size_t size, __u_char digest[MD5_DIGEST_LENGTH]);
 
-struct type_object_s *create_id_object(int id);
+struct type_object_s *create_id_object(int);
 
-const struct type_object_s *(*create_object[])(int) = {
+struct type_object_s *(*const create_object[])(int) = {
     &create_id_object,
     &create_id_object
 };

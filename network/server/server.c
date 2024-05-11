@@ -90,7 +90,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 			if (n == sizeof(struct request_s) + sizeof(digest)) {
 				cipher(buffer, sizeof(struct request_s), digest);
 				if (!memcmp(buffer + sizeof(struct request_s), digest, sizeof(digest))) {
-					struct request_s *request = buffer;
+					struct request_s *request = (struct request_s *)buffer;
 					// write(1, "message clear\n", strlen("message clear\n"));
 					printf("message type ; %d\n", request->type);
 					struct type_object_s *request_handler = create_object[request->type](is_new);
