@@ -17,9 +17,16 @@ static void on_destroy(void)
 
 }
 
+static void get_type(void)
+{
+    return 2;
+}
+
+
 tiles_t *create_wall(sfVector2f pos)
 {
     struct wall_s *wall = malloc(sizeof(struct wall_s));
+    #ifndef SERVER
     static sfSprite *sprite = NULL;
     static sfTexture* texture = NULL;
     
@@ -38,11 +45,12 @@ tiles_t *create_wall(sfVector2f pos)
         
         sfSprite_setTexture(sprite, texture, sfFalse);
     }
+    wall->spirte = sprite;
+    wall->print = &print;
+    #endif
     wall->position = pos;
     wall->on_colide = &on_colide;
-    wall->print = &print;
     wall->on_destroy = &on_destroy;
-    wall->spirte = sprite;
 
     return (tiles_t*)wall;
 }

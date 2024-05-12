@@ -22,9 +22,16 @@ static void on_destroy(void)
 
 }
 
+static void get_type(void)
+{
+    return 2;
+}
+
+
 tiles_t *create_ground(sfVector2f pos)
 {
     struct ground_s *ground = malloc(sizeof(struct ground_s));
+    #ifndef SERVER
     static sfSprite *sprite = NULL;
     static sfTexture* texture = NULL;
     
@@ -43,12 +50,13 @@ tiles_t *create_ground(sfVector2f pos)
         
         sfSprite_setTexture(sprite, texture, sfFalse);
     }
-
+    ground->spirte = sprite;
+    ground->print = &print;
+    #endif
     ground->position = pos;
     ground->on_colide = &on_colide;
-    ground->print = &print;
     ground->on_destroy = &on_destroy;
-    ground->spirte = sprite;
+    ground->get_type = &get_type;
 
     return (tiles_t*)ground;
 }

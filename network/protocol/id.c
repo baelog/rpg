@@ -30,7 +30,7 @@ static void send_response(struct id_object_s* self, int udpfd)
 
     char to_send[sizeof(response) + MD5_DIGEST_LENGTH] = {0};
     
-    create_payload(to_send, &response, 16);
+    create_payload(to_send, &response, sizeof(struct response_id_s));
 
     sendto(udpfd, to_send, sizeof(to_send), 0, 
 					(struct sockaddr*)self->client, sizeof(*self->client));
@@ -47,7 +47,7 @@ type_object_t *create_id_object(int id)
 {
     struct id_object_s *object = malloc(sizeof(struct id_object_s));
 
-    object->client_id = id;
+    object->client_id = id + 1;
     object->handle = &handle_request;
     object->response = &send_response;
     object->destroy = &destroy_self;

@@ -6,6 +6,14 @@
 typedef struct request_s request_t;
 typedef struct type_object_s type_object_t;
 
+#define VISION_SIZE 30
+
+struct vision_s {
+    sfVector2f position;
+    int type;
+    int player_type;
+};
+
 typedef union {
     int value;
     sfVector2f vector;
@@ -13,7 +21,7 @@ typedef union {
 
 typedef union {
     int id;
-    sfVector2f position;
+    struct vision_s object[VISION_SIZE];
 }Response_body;
 
 enum type {

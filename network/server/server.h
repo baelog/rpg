@@ -1,9 +1,4 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** server
-*/
+
 
 #ifndef SERVER_H_
 #define SERVER_H_
@@ -11,6 +6,8 @@
 // #include "protocol/types.h"
 #include <SFML/System/Vector2.h>
 #include <openssl/md5.h>
+
+typedef struct world_s world_t;
 
 typedef union {
     int value;
@@ -55,7 +52,9 @@ struct type_object_s {
     void (*destroy)(struct type_object_s*);
 };
 
-int cipher(void *data, size_t size, __u_char digest[MD5_DIGEST_LENGTH]);
+int cipher(void *data, size_t size, __u_char *digest);
+
+world_t *instanciate_file(char *file);
 
 struct type_object_s *create_id_object(int);
 

@@ -13,13 +13,17 @@
 
 typedef struct tiles_s tiles_t;
 
+
 struct ground_s{
     sfVector2f position;
+#ifndef SERVER
     sfSprite *spirte;
     void (*print)(void);
+#endif
     void *on_colide;
     void *on_destroy;
+    int (*get_type)(void);
+    int spawn;
 };
-
 
 #endif /* !GROUND_H_ */

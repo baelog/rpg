@@ -41,19 +41,7 @@ void remove_array_index(void *array, int index, int len)
 }
 
 
-struct client *new_client(struct sockaddr_in client)
-{
-	static int client_id = 0;
 
-	struct client *new_client = malloc(sizeof(struct client));
-	struct sockaddr_in *new = malloc(sizeof(struct sockaddr_in));
-
-	memcpy(new, &client, sizeof(client));
-	new_client->socket = new;
-	new_client->id = client_id++;
-
-	return new_client;
-}
 
 int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cliaddr)
 {
@@ -67,7 +55,7 @@ int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cl
 	return 0;
 }
 
-void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], int client_count)
+void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], int client_count, world_t *map)
 {
 	struct sockaddr_in cliaddr;
 	socklen_t len = sizeof(cliaddr);
@@ -81,6 +69,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 			return;
 		if (!is_new && client_count < MAX_CLIENTS) {
 			client_list[client_count++] = new_client(cliaddr);
+
 		}
 		write(1, buffer, n);
 		if (n >= 0) {
@@ -106,7 +95,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 	}
 }
 
-int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]) {
+int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], world_t *map) {
 	int nready;
     struct timeval timeout;
 	int client_count = array_len((client_list));
@@ -122,7 +111,7 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 
 	if (nready > 0) {
 		// If the UDP socket is readable, receive the message
-		read_client(udpfd, rset, client_list, client_count);
+		read_client(udpfd, rset, client_list, client_count, map);
 		
 	} else {
 		// Broadcast a message to all clients in the list
@@ -131,12 +120,12 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 		for (int i = 0; i < client_count; i++) {
 			ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
 					(struct sockaddr*)client_list[i], sizeof(*(client_list[i])));
-			if (n < -1) {
-				printf("peut tre que que deconnecte ?\n");
-				remove_array_index(client_list, i, MAX_CLIENTS);
-				i--;
+			// if (n < -1) {
+			// 	// printf("peut tre que que deconnecte ?\n");
+			// 	remove_array_index(client_list, i, MAX_CLIENTS);
+			// 	i--;
 
-			}
+			// }
 		}
 	}
 }
@@ -164,9 +153,11 @@ int main() {
     // Bind the socket to the address and port
     bind(udpfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
 
+	world_t *map = instanciate_file("./assets/map/scene1.yaml");
+	
     // Main loop
     while (1) {
-		server_loop(udpfd, &rset, client_list);
+		server_loop(udpfd, &rset, client_list, map);
     }
 
     close(udpfd);

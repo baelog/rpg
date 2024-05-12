@@ -9,19 +9,19 @@
 
 
 
-sfVector2i get_spawn_position(void *origin)
-{
-    char **map = origin;
-    int y, x;
+// sfVector2i get_spawn_position(void *origin)
+// {
+//     char **map = origin;
+//     int y, x;
 
-    for (y = 0; map[y]; y++)
-        for (x = 0; map[y][x]; x++)
-            if (map[y][x] == PLAYER + '0')
-                return (sfVector2i){x, y};
-    perror("no player");
-    exit(EXIT_FAILURE);
+//     for (y = 0; map[y]; y++)
+//         for (x = 0; map[y][x]; x++)
+//             if (map[y][x] == PLAYER + '0')
+//                 return (sfVector2i){x, y};
+//     perror("no player");
+//     exit(EXIT_FAILURE);
 
-}
+// }
 
 size_t array_len(void *array)
 {
@@ -35,7 +35,7 @@ size_t array_len(void *array)
 tiles_t **create_map(char **content_file)
 {
     //TODO api ?
-    sfVector2i player_position = get_spawn_position(content_file);
+    // sfVector2i player_position = get_spawn_position(content_file);
 
 
 
