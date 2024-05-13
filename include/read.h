@@ -1,9 +1,4 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** read
-*/
+
 
 #ifndef READ_H_
 #define READ_H_

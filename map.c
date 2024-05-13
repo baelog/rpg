@@ -22,8 +22,11 @@ tiles_t ***create_scene_object(grid_t scene)
         for (j = 0; j != scene.rows[i]->column_count; ++j) {
             scene_object[i][j] = backgroundConstructor[scene.rows[i]->columns[j]->value](pos);
             pos.x += 50;
-            if (scene.rows[i]->columns[j]->spawn)
+            if (scene.rows[i]->columns[j]->spawn) {
                 scene_object[i][j]->spawn = scene.rows[i]->columns[j]->spawn;
+                printf("je suis la %f %f\n", scene_object[i][j]->position.x, scene_object[i][j]->position.y);
+                
+            }
         }
         scene_object[i][j] = NULL;
         pos.y += 50;

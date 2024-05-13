@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** yaml
-*/
 
 #ifndef YAML_H_
 #define YAML_H_

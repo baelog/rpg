@@ -1,9 +1,4 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** wall
-*/
+
 
 #ifndef WALL_H_
 #define WALL_H_

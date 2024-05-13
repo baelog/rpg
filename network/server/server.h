@@ -52,15 +52,12 @@ struct type_object_s {
     void (*destroy)(struct type_object_s*);
 };
 
-int cipher(void *data, size_t size, __u_char *digest);
+int cipher(void *data, size_t size, char *digest);
 
 world_t *instanciate_file(char *file);
 
+void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd);
 struct type_object_s *create_id_object(int);
-
-struct type_object_s *(*const create_object[])(int) = {
-    &create_id_object,
-    &create_id_object
-};
+struct client *new_client(struct sockaddr_in client, world_t *world_information);
 
 #endif /* !SERVER_H_ */

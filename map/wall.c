@@ -8,8 +8,10 @@ static void on_colide(void)
 
 static void print(struct wall_s *self, sfRenderWindow *window)
 {
+    #ifndef SERVER
     sfSprite_setPosition(self->spirte, self->position);
     sfRenderWindow_drawSprite(window, self->spirte, NULL);
+    #endif
 }
 
 static void on_destroy(void)
@@ -17,9 +19,9 @@ static void on_destroy(void)
 
 }
 
-static void get_type(void)
+static int get_type(void)
 {
-    return 2;
+    return 1;
 }
 
 
@@ -51,6 +53,8 @@ tiles_t *create_wall(sfVector2f pos)
     wall->position = pos;
     wall->on_colide = &on_colide;
     wall->on_destroy = &on_destroy;
+    wall->get_type = &get_type;
+    wall->spawn = 0;
 
     return (tiles_t*)wall;
 }

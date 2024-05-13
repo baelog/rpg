@@ -57,6 +57,10 @@ int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cl
 
 void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], int client_count, world_t *map)
 {
+	struct type_object_s *(*const create_object[])(int) = {
+		&create_id_object,
+		&create_id_object
+	};
 	struct sockaddr_in cliaddr;
 	socklen_t len = sizeof(cliaddr);
     char buffer[MAXLINE];
@@ -68,10 +72,10 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 		if (!is_new && client_count >= MAX_CLIENTS)
 			return;
 		if (!is_new && client_count < MAX_CLIENTS) {
-			client_list[client_count++] = new_client(cliaddr);
+			client_list[client_count++] = new_client(cliaddr, map);
 
 		}
-		write(1, buffer, n);
+		// write(1, buffer, n);
 		if (n >= 0) {
 			char digest[MD5_DIGEST_LENGTH] = { 0 };
 			// printf("message len %d, size of all %d\n", n, sizeof(struct request_s) + sizeof(digest));
@@ -118,8 +122,10 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 		printf("%d\n", client_count);
 		const char* broadcast_message = "Broadcast message from UDP server";
 		for (int i = 0; i < client_count; i++) {
-			ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
-					(struct sockaddr*)client_list[i], sizeof(*(client_list[i])));
+			broadcast(client_list[i]->socket, client_list[i]->id, map, udpfd);
+
+			// ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
+			// 		(struct sockaddr*)client_list[i], sizeof(*(client_list[i])));
 			// if (n < -1) {
 			// 	// printf("peut tre que que deconnecte ?\n");
 			// 	remove_array_index(client_list, i, MAX_CLIENTS);

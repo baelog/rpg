@@ -30,10 +30,10 @@ typedef struct player_s {
 #ifndef SERVER
     sfSprite *spirte;
     void (*print)(struct tiles_s*, sfRenderWindow*);
-    int id;
 #endif
     void *on_colide;
     void *on_destroy;
+    int id;
 }player_t;
 
 typedef struct world_s {

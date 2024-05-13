@@ -16,4 +16,4 @@ struct response_id_s {
 typedef struct world_s world_t;
 void player_vision();
 
-void send(struct sockaddr_in *client, int client_id, world_t* map, int fd);
+// void send(struct sockaddr_in *client, int client_id, world_t* map, int fd);

@@ -11,100 +11,147 @@
 #include <arpa/inet.h>
 #include <openssl/md5.h>
 #include <unistd.h>
+#include <SFML/Graphics/RenderWindow.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "../../include/read.h"
+#include "../../include/window.h"
+#include "../../include/map.h"
+#include "../../include/yaml.h"
 
 // #include "types.h"
 
 #define PORT 5000 
-#define MAXLINE 1024 
+#define MAXLINE 1024
 
-int main() 
-{ 
-	int sockfd; 
-	char buffer[MAXLINE]; 
-	char* message = "Hello Server"; 
-	struct sockaddr_in servaddr; 
-
-	int n, len; 
-	// Creating socket file descriptor 
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
-		printf("socket creation failed"); 
-		exit(0); 
-	} 
-
-	memset(&servaddr, 0, sizeof(servaddr)); 
-
-	// Filling server information 
-	servaddr.sin_family = AF_INET; 
-	servaddr.sin_port = htons(PORT); 
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-	// send hello message to server 
-
+int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
+{
+	int len;
 	u_char digest[MD5_DIGEST_LENGTH];
+
+	ssize_t n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
+					0, servaddr, 
+					&len);
+
+	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
+		printf("bad message len\n");
+		return 0;
+	}
+
+	cipher(buffer, sizeof(struct response_id_s), digest);
+
+	if (memcmp(buffer + sizeof(struct response_id_s), digest, sizeof(digest))) {
+		printf("message is corrupt\n");
+		return 0;
+	}
+	return 1;
+}
+
+int create_socket(struct sockaddr_in *servaddr)
+{
+	int sockfd; 
+
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
+		return -1;
+	}
+
+	memset(servaddr, 0, sizeof(servaddr)); 
+	// Filling server information 
+	servaddr->sin_family = AF_INET; 
+	servaddr->sin_port = htons(PORT); 
+	servaddr->sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	return sockfd;
+
+}
+
+int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_size) {
 	struct request_id_s request;
 	memset(&request, 0, sizeof(struct request_id_s));
 	request.len = sizeof(struct request_id_s);
 	request.type = ID;
 	request.body.value = 0;
 
-	// request.len = htons(request.len);
-	// request.type = htons(request.type);
-	// request.body.value = htons(request.body.value);
+	char to_send[sizeof(request) + MD5_DIGEST_LENGTH];
 
-	// printf("%d %d %d\n", request.len, request.type, request.body.value);
-	cipher(&request, sizeof(struct request_id_s), digest);
-	
-	char to_send[sizeof(request) + sizeof(digest)] = {0};
-	
-	memcpy(to_send, (char*)&request, sizeof(request));
-	memcpy(to_send + sizeof(request), digest, sizeof(digest));
-
-	// write(1, request, sizeof(request));
-
-	// write(1, to_send, sizeof(to_send));
+	create_payload(to_send, &request, sizeof(request));
 
 	sendto(sockfd, (const char*)to_send, sizeof(to_send), 
-		0, (const struct sockaddr*)&servaddr, 
-		sizeof(servaddr));
-	
-	n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
-					0, (struct sockaddr*)&servaddr, 
-					&len);
-	// write(1, buffer + sizeof(struct response_id_s), sizeof(digest));
-	write(1, buffer , n);
-	
-	// printf("%d %d\n", n, sizeof(struct response_id_s));
-	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
-		printf("bad message len\n");
-		return 0;
+		0, servaddr, servaddr_size);
+	write(1, "je suis la", strlen("je suis la"));
+	if (!get_message(buffer, sockfd, &servaddr))
+		return -1;
+
+	return 0;
+}
+
+void create_tiles(tiles_t **array, struct response_id_s *response)
+{
+	tiles_t *(*backgroundConstructor[]) (sfVector2f) = {
+		&create_ground, //TODO create the void finction
+		&create_wall,
+		&create_ground
+	};
+	int j = 0;
+	for (int i = 0; i != VISION_SIZE && response->body.object[i].type >= 0; i++) {
+		
+		// if (!response->body.object[i].type)
+		// 	printf("player: %d %f %f\n", response->body.object[i].player_type, response->body.object[i].position.x, response->body.object[i].position.y);
+		if (response->body.object[i].type)
+			array[j++] = backgroundConstructor[response->body.object[i].type](response->body.object[i].position);
 	}
+	while (j < VISION_SIZE)
+		array[j++] = NULL;
+}
 
-	cipher(buffer, 16, digest);
-
-	// printf("%d \n", sizeof(struct response_id_s))
-	if (memcmp(buffer + 16, digest, sizeof(digest))) {
-		printf("message is corrupt\n");
+int main() 
+{ 
+	char buffer[MAXLINE];
+	struct sockaddr_in servaddr; 
+	int sockfd = create_socket(&servaddr); 
+ 
+	if (sockfd < 0)
 		return 0;
-	}
 
+	if (get_id(sockfd, &servaddr, buffer, sizeof(servaddr)) < 0)
+		return 0;
 	struct response_id_s *response = (struct response_id_s*)buffer;
-	printf("%d %d %d\n", response->type, response->len, response->body.id);
-	printf("message recieved");
-	// sendto(sockfd, (const char*)digest, MD5_DIGEST_LENGTH, 
-	// 	0, (const struct sockaddr*)&servaddr, 
-	// 	sizeof(servaddr));
-	// receive server's response 
-	// printf("Message from server: "); 
-
 	
-	// while (1) {
-	// 	n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
-	// 				0, (struct sockaddr*)&servaddr, 
-	// 				&len); 
-	// 	if (n < 0)
-	// 		exit(0);
-	// 	buffer[n] = '\0';
-	// 	puts(buffer); 
-	// }
+	
+    sfVideoMode mode = {WIDTH, HEIGHT, BITSPERPIXEL};
+    sfRenderWindow* window;
+    sfEvent event;
+    /* Create the main window */
+    window = sfRenderWindow_create(mode, "SFML window", sfResize | sfClose, NULL);
+    if (!window)
+        return EXIT_FAILURE;
+    /* Load a sprite to display */
+    tiles_t *scene_object[VISION_SIZE] = { NULL };
+    
+    sfRenderWindow_setFramerateLimit(window, FRAMERATELIMIT);
+
+    while (sfRenderWindow_isOpen(window))
+    {
+        /* Process events */
+        while (sfRenderWindow_pollEvent(window, &event))
+        {
+            /* Close window : exit */
+            if (event.type == sfEvtClosed)
+                sfRenderWindow_close(window);
+        }
+		if (get_message(buffer, sockfd, &servaddr)) {
+			create_tiles(scene_object, (struct response_id_s *)buffer);
+		}
+		for (int i = 0; scene_object[i] && i < VISION_SIZE; i++)
+			scene_object[i]->print(scene_object[i], window);
+        /* Clear the screen */
+        /* Update the window */
+        sfRenderWindow_display(window);
+        sfRenderWindow_clear(window, sfBlack);
+    }
+    /* Cleanup resources */
+    sfRenderWindow_destroy(window);
 	close(sockfd); 
 	return 0; 
 } 

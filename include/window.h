@@ -1,9 +1,3 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** window
-*/
 
 #ifndef WINDOW_H_
 #define WINDOW_H_

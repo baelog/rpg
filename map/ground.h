@@ -1,9 +1,4 @@
-/*
-** EPITECH PROJECT, 2024
-** rpg
-** File description:
-** ground
-*/
+
 
 #ifndef GROUND_H_
 #define GROUND_H_
