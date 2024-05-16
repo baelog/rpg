@@ -35,7 +35,7 @@ row_t *create_row(char ***file) {
             while (**file && !strncmp(**file, "      ", strlen("      "))) {
                 row->column_count++;
                 row->columns = realloc(row->columns, sizeof(column_t*) * (row->column_count));
-                printf("\n col= %d\n", row->column_count);
+                // printf("\n col= %d\n", row->column_count);
                 
                 row->columns[row->column_count - 1] = create_column(file);
             }
@@ -61,6 +61,6 @@ grid_t create_scene(char **file) {
         scene.rows[scene.row_count] = create_row(&ptr);
         scene.row_count++;
     }
-    printf("\n%d\n", scene.row_count);
+    // printf("\n%d\n", scene.row_count);
     return scene;
 }

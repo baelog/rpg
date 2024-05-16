@@ -19,6 +19,10 @@
 #include "../../include/window.h"
 #include "../../include/map.h"
 #include "../../include/yaml.h"
+#include <pthread.h>
+// #include "player.h"
+#include "../tools.h"
+#include "client.h"
 
 // #include "types.h"
 
@@ -77,10 +81,11 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 
 	create_payload(to_send, &request, sizeof(request));
 
+	do {
 	sendto(sockfd, (const char*)to_send, sizeof(to_send), 
 		0, servaddr, servaddr_size);
-	write(1, "je suis la", strlen("je suis la"));
-	if (!get_message(buffer, sockfd, &servaddr))
+	// write(1, "je suis la", strlen("je suis la"));
+	} while (!sleep(5) && !get_message(buffer, sockfd, servaddr));
 		return -1;
 
 	return 0;
@@ -105,18 +110,44 @@ void create_tiles(tiles_t **array, struct response_id_s *response)
 		array[j++] = NULL;
 }
 
-int main() 
-{ 
+int handle_server_connection(struct thread_args *args)
+{
 	char buffer[MAXLINE];
-	struct sockaddr_in servaddr; 
-	int sockfd = create_socket(&servaddr); 
- 
-	if (sockfd < 0)
+
+	if (get_id(args->sockfd, args->servaddr, buffer, sizeof(struct sockaddr)) < 0)
 		return 0;
 
-	if (get_id(sockfd, &servaddr, buffer, sizeof(servaddr)) < 0)
+	if (get_message(buffer, args->sockfd, args->servaddr)) {
+		create_tiles(args->client_informations->scene_object, (struct response_id_s *)buffer);
+	}
+}
+
+void init_client_informations(struct client_information* client_informations)
+{
+	init_array(client_informations->players, VISION_SIZE);
+	init_array(client_informations->scene_object, VISION_SIZE);
+	client_informations->player_id = 0;
+	client_informations->requests = NULL;
+}
+
+int main(void) 
+{ 
+	pthread_t tid;
+	struct sockaddr_in servaddr;
+	struct client_information client_informations;
+	char buffer[MAXLINE];
+
+	int sockfd = create_socket(&servaddr); 
+	if (sockfd < 0)
 		return 0;
-	struct response_id_s *response = (struct response_id_s*)buffer;
+	
+	init_client_informations(&client_informations);
+
+	struct thread_args args = {&client_informations, sockfd, &servaddr};
+	pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
+	// if (get_id(sockfd, (struct sockaddr *)&servaddr, buffer, sizeof(servaddr)) < 0)
+	// 	return 0;
+	// struct response_id_s *response = (struct response_id_s*)buffer;
 	
 	
     sfVideoMode mode = {WIDTH, HEIGHT, BITSPERPIXEL};
@@ -128,6 +159,7 @@ int main()
         return EXIT_FAILURE;
     /* Load a sprite to display */
     tiles_t *scene_object[VISION_SIZE] = { NULL };
+    player_t *players[VISION_SIZE] = { NULL };
     
     sfRenderWindow_setFramerateLimit(window, FRAMERATELIMIT);
 
@@ -140,7 +172,7 @@ int main()
             if (event.type == sfEvtClosed)
                 sfRenderWindow_close(window);
         }
-		if (get_message(buffer, sockfd, &servaddr)) {
+		if (get_message(buffer, sockfd, (struct sockaddr *)&servaddr)) {
 			create_tiles(scene_object, (struct response_id_s *)buffer);
 		}
 		for (int i = 0; scene_object[i] && i < VISION_SIZE; i++)

@@ -6,18 +6,21 @@
 // #include "protocol/types.h"
 #include <SFML/System/Vector2.h>
 #include <openssl/md5.h>
+#include "../protocol/types.h"
+
+#define VISION_SIZE 30
 
 typedef struct world_s world_t;
 
-typedef union {
-    int value;
-    sfVector2f vector;
-}Request_body;
+// typedef union {
+//     int value;
+//     sfVector2f vector;
+// }Request_body;
 
-typedef union {
-    int id;
-    sfVector2f position;
-}Response_body;
+// typedef union {
+//     int id;
+//     struct vision_s object[VISION_SIZE];
+// }Response_body;
 
 enum type {
     BROADDCAST,

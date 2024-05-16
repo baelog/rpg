@@ -18,7 +18,7 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
     int i = 0;
     for (int j = 0; j != nb_player; j++) {
         response_body->object[i].position = player_list[j].position;
-        response_body->object[i].player_type = player->id == player_list[j].id;
+        response_body->object[i].player_type = player->id == player_list[j].id ? 0 : player->id;
         response_body->object[i].type = 0;
         i++;
     }
