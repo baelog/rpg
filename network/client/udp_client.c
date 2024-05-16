@@ -29,6 +29,8 @@
 #define PORT 5000 
 #define MAXLINE 1024
 
+pthread_mutex_t lock;
+
 int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 {
 	int len;
@@ -70,8 +72,10 @@ int create_socket(struct sockaddr_in *servaddr)
 
 }
 
-int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_size) {
+int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_size, int *id) {
 	struct request_id_s request;
+	struct response_id_s *response;
+
 	memset(&request, 0, sizeof(struct request_id_s));
 	request.len = sizeof(struct request_id_s);
 	request.type = ID;
@@ -86,9 +90,13 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 		0, servaddr, servaddr_size);
 	// write(1, "je suis la", strlen("je suis la"));
 	} while (!sleep(5) && !get_message(buffer, sockfd, servaddr));
-		return -1;
 
-	return 0;
+	response = (struct response_id_s*)buffer;
+	pthread_mutex_lock(&lock);
+	*id = response->body.id;
+	pthread_mutex_unlock(&lock); 
+	// printf("my id %d", id);
+	return response->body.id;
 }
 
 void create_tiles(tiles_t **array, struct response_id_s *response)
@@ -99,25 +107,36 @@ void create_tiles(tiles_t **array, struct response_id_s *response)
 		&create_ground
 	};
 	int j = 0;
+	pthread_mutex_lock(&lock);
+
 	for (int i = 0; i != VISION_SIZE && response->body.object[i].type >= 0; i++) {
 		
 		// if (!response->body.object[i].type)
 		// 	printf("player: %d %f %f\n", response->body.object[i].player_type, response->body.object[i].position.x, response->body.object[i].position.y);
-		if (response->body.object[i].type)
+		if (response->body.object[i].type) {
+			// printf("not my type ? %d\n", response->body.object[i].type);
 			array[j++] = backgroundConstructor[response->body.object[i].type](response->body.object[i].position);
+		}
 	}
+	pthread_mutex_unlock(&lock);
 	while (j < VISION_SIZE)
 		array[j++] = NULL;
 }
 
-int handle_server_connection(struct thread_args *args)
+/**
+ * this function is to get message from server
+ * @param pointer take a pointer of struct to get args
+ * @return nothing
+*/
+void *handle_server_connection(void *ptr)
 {
+	struct thread_args *args = ptr;
 	char buffer[MAXLINE];
 
-	if (get_id(args->sockfd, args->servaddr, buffer, sizeof(struct sockaddr)) < 0)
+	if (get_id(args->sockfd, (struct sockaddr *)args->servaddr, buffer, sizeof(struct sockaddr_in), &args->client_informations->player_id) < 0)
 		return 0;
-
-	if (get_message(buffer, args->sockfd, args->servaddr)) {
+	
+	if (get_message(buffer, args->sockfd, (struct sockaddr *)args->servaddr)) {
 		create_tiles(args->client_informations->scene_object, (struct response_id_s *)buffer);
 	}
 }
@@ -143,7 +162,7 @@ int main(void)
 	
 	init_client_informations(&client_informations);
 
-	struct thread_args args = {&client_informations, sockfd, &servaddr};
+	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr};
 	pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
 	// if (get_id(sockfd, (struct sockaddr *)&servaddr, buffer, sizeof(servaddr)) < 0)
 	// 	return 0;
@@ -158,8 +177,8 @@ int main(void)
     if (!window)
         return EXIT_FAILURE;
     /* Load a sprite to display */
-    tiles_t *scene_object[VISION_SIZE] = { NULL };
-    player_t *players[VISION_SIZE] = { NULL };
+    // tiles_t *scene_object[VISION_SIZE] = { NULL };
+    // player_t *players[VISION_SIZE] = { NULL };
     
     sfRenderWindow_setFramerateLimit(window, FRAMERATELIMIT);
 
@@ -172,18 +191,24 @@ int main(void)
             if (event.type == sfEvtClosed)
                 sfRenderWindow_close(window);
         }
-		if (get_message(buffer, sockfd, (struct sockaddr *)&servaddr)) {
-			create_tiles(scene_object, (struct response_id_s *)buffer);
+			// printf("je rentre enfin%d\n", client_informations.player_id);
+
+		if (client_informations.player_id) {
+			// printf("je rentre enfin\n");
+			// if (get_message(buffer, sockfd, (struct sockaddr *)&servaddr)) {
+			// 	create_tiles(client_informations->scene_object, (struct response_id_s *)buffer);
+			// }
+			for (int i = 0; client_informations.scene_object[i] && i < VISION_SIZE; i++)
+				client_informations.scene_object[i]->print(client_informations.scene_object[i], window);
+			/* Clear the screen */
+			/* Update the window */
+			sfRenderWindow_display(window);
+			sfRenderWindow_clear(window, sfBlack);
 		}
-		for (int i = 0; scene_object[i] && i < VISION_SIZE; i++)
-			scene_object[i]->print(scene_object[i], window);
-        /* Clear the screen */
-        /* Update the window */
-        sfRenderWindow_display(window);
-        sfRenderWindow_clear(window, sfBlack);
     }
     /* Cleanup resources */
     sfRenderWindow_destroy(window);
+	pthread_join(tid, NULL);
 	close(sockfd); 
 	return 0; 
 } 

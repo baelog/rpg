@@ -1,9 +1,12 @@
 #include "ground.h"
 #include <stdlib.h>
-#include <SFML/Graphics/Sprite.h>
+#ifndef SERVER
+#include <SFML/Graphics/RenderWindow.h>
 #include <SFML/Graphics/Image.h>
 #include <SFML/Graphics/Texture.h>
-#include <SFML/Graphics/RenderWindow.h>
+#include <SFML/Graphics/Sprite.h>
+#endif
+
 
 
 static void on_colide(void)

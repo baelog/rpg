@@ -1,5 +1,12 @@
 #include "wall.h"
 #include <stdlib.h>
+#include <stdio.h>
+#ifndef SERVER
+#include <SFML/Graphics/RenderWindow.h>
+#include <SFML/Graphics/Image.h>
+#include <SFML/Graphics/Texture.h>
+#include <SFML/Graphics/Sprite.h>
+#endif
 
 static void on_colide(void)
 {
@@ -34,6 +41,10 @@ tiles_t *create_wall(sfVector2f pos)
     
     if (!texture) {
         sfImage *image = sfImage_create(50, 50);
+        // if (!image) {
+        //     write(1, "error can't create image\n", strlen("error can't create image\n"));
+        //     // exit(0);
+        // }
         for (unsigned int x = 0; x < 50; x++) {
             for (unsigned int y = 0; y < 50; y++)
                 sfImage_setPixel(image, x, y, sfRed);

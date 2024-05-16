@@ -22,14 +22,14 @@ typedef struct world_s world_t;
 //     struct vision_s object[VISION_SIZE];
 // }Response_body;
 
-enum type {
-    BROADDCAST,
-    ID,
-    POSITION,
-    INVENTARY,
-    ACTIONS,
-    ERROR
-};
+// enum type {
+//     BROADDCAST,
+//     ID,
+//     POSITION,
+//     INVENTARY,
+//     ACTIONS,
+//     ERROR
+// };
 
 struct request_s {
     int len;

@@ -7,13 +7,13 @@ set(CMAKE_PREFIX_PATH "usr/local/lib/")
 # Find the CSFML package
 # find_package(CSFML 2.5.2 REQUIRED COMPONENTS system window graphics audio network)
 
-set(CSFML_DIR "/path/to/csfml/install")
+# set(CSFML_DIR "/path/to/csfml/install")
 # Add the executable target
 add_executable(client
                 network/client/udp_client.c
                 network/md5.c
-                network/create_payload.c                
-
+                network/create_payload.c           
+                network/tools.c
                 # yaml.c
                 # read.c
                 # map.c

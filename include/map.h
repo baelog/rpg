@@ -7,6 +7,8 @@
 
 #define MAX_PLAYER 10
 
+typedef struct grid_s grid_t;
+
 enum tiles {
     PLAYER,
     WALL,
@@ -45,7 +47,8 @@ typedef struct world_s {
 tiles_t *create_ground(sfVector2f);
 tiles_t *create_wall(sfVector2f);
 
-tiles_t ***create_scene_object(grid_t);
+tiles_t ***create_scene_object(grid_t*);
+char **handle_file(char*);
 
 #endif /* !MAP_H_ */
 

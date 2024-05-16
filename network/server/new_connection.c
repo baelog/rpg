@@ -3,6 +3,7 @@
 #include "../../include/map.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static void on_colide(void) {
 
@@ -20,9 +21,9 @@ int create_player(player_t *new_player, tiles_t ***map, int id)
 
     for (int i = 0; map[i]; i++) {
         for (int j = 0; map[i][j]; j++) {
-            printf("je tourne\n");
+            // printf("je tourne\n");
             if (map[i][j]->spawn) {
-                printf("ici la victoire %f, %f\n", map[i][j]->position.x, map[i][j]->position.y);
+                // printf("ici la victoire %f, %f\n", map[i][j]->position.x, map[i][j]->position.y);
                 new_player->position = (sfVector2f){map[i][j]->position.x, map[i][j]->position.y};
                 return 0;
             }

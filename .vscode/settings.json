@@ -3,6 +3,7 @@
         "types.h": "c",
         "test": "c",
         "functional": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "yaml.h": "c"
     }
 }
