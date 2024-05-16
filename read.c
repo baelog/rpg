@@ -12,7 +12,7 @@ int count_char(char *str, char c)
     for (int i = 0; str[i]; i++)
         if (str[i] == c)
             count++;
-    printf("%d\n", count);
+    // printf("%d\n", count);
     return count;
 }
 

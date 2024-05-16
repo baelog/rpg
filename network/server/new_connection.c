@@ -45,7 +45,7 @@ struct client *new_client(struct sockaddr_in client, world_t *world_information)
 	new_client->id = client_id++;
 
     create_player(&world_information->player[new_client->id - 1], world_information->map, new_client->id);
-    printf("player posion at spawn %f %f\n", world_information->player[client_id - 1].position.x, world_information->player[client_id - 1].position.y);
+    // printf("player posion at spawn %f %f\n", world_information->player[client_id - 1].position.x, world_information->player[client_id - 1].position.y);
     world_information->player_count++;
 
 	return new_client;

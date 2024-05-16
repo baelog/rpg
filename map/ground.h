@@ -13,7 +13,7 @@ struct ground_s{
     sfVector2f position;
 #ifndef SERVER
     sfSprite *spirte;
-    void (*print)(void);
+    void (*print)(struct ground_s*, sfRenderWindow*);
 #endif
     void *on_colide;
     void *on_destroy;

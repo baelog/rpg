@@ -85,7 +85,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 				if (!memcmp(buffer + sizeof(struct request_s), digest, sizeof(digest))) {
 					struct request_s *request = (struct request_s *)buffer;
 					// write(1, "message clear\n", strlen("message clear\n"));
-					printf("message type ; %d\n", request->type);
+					// printf("message type ; %d\n", request->type);
 					struct type_object_s *request_handler = create_object[request->type](is_new);
 					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr);
 					request_handler->response(request_handler, udpfd);
@@ -94,7 +94,6 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 		}
 		if (n < 0) {
 			remove_array_index(client_list, is_new, MAX_CLIENTS);
-			printf("je suis la pour delete les clients mais en backup\n");
 		}
 	}
 }
@@ -119,8 +118,8 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 		
 	} else {
 		// Broadcast a message to all clients in the list
-		printf("%d\n", client_count);
-		const char* broadcast_message = "Broadcast message from UDP server";
+		// printf("%d\n", client_count);
+		// const char* broadcast_message = "Broadcast message from UDP server";
 		for (int i = 0; i < client_count; i++) {
 			broadcast(client_list[i]->socket, client_list[i]->id, map, udpfd);
 
