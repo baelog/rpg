@@ -5,6 +5,8 @@
 
 typedef struct request_s request_t;
 typedef struct type_object_s type_object_t;
+typedef struct world_s world_t;
+typedef struct player_s player_t;
 
 #define VISION_SIZE 30
 
@@ -27,9 +29,8 @@ typedef union {
 enum type {
     BROADDCAST,
     ID,
-    POSITION,
-    INVENTARY,
     ACTIONS,
+    INVENTARY,
     ERROR
 };
 

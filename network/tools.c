@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tools.h"
+#include <stdlib.h>
 
 int array_len(void *array)
 {
@@ -98,6 +99,15 @@ void pop_address(struct list_s **list, void *address)
         free(tmp->ptr);
         free(tmp);
     }
+}
 
-    
+struct list_s *find_id(struct list_s *list, int id)
+{
+    while (list) {
+        struct IResponse *request = (struct IResponse *)list->ptr;
+        if (request->request_id == id)
+            return list;
+        list = list->next;
+    }
+    return list;
 }

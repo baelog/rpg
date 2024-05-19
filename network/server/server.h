@@ -34,12 +34,14 @@ typedef struct world_s world_t;
 struct request_s {
     int len;
     int type;
+    int request_id;
     Request_body body;
 };
 
 struct response_s {
     int len;
     int type;
+    int request_id;
     Response_body body;
 };
 
@@ -50,7 +52,7 @@ struct client {
 
 struct type_object_s {
     int client_id;
-    void (*handle)(struct type_object_s *self, struct request_s*, struct sockaddr_in*);
+    void (*handle)(struct type_object_s *self, struct request_s*, struct sockaddr_in*, world_t *informations);
     void (*response)(struct type_object_s* self, int fd);
     void (*destroy)(struct type_object_s*);
 };
@@ -61,6 +63,7 @@ world_t *instanciate_file(char *file);
 
 void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd);
 struct type_object_s *create_id_object(int);
+type_object_t *create_action_object(int id);
 struct client *new_client(struct sockaddr_in client, world_t *world_information);
 
 #endif /* !SERVER_H_ */

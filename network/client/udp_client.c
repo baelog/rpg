@@ -33,8 +33,8 @@ pthread_mutex_t lock;
 
 int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 {
-	int len;
-	u_char digest[MD5_DIGEST_LENGTH];
+	int len = 0;
+	unsigned char digest[MD5_DIGEST_LENGTH];
 
 	ssize_t n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
 					0, servaddr, 
@@ -69,7 +69,6 @@ int create_socket(struct sockaddr_in *servaddr)
 	servaddr->sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	return sockfd;
-
 }
 
 int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_size, int *id) {
@@ -188,8 +187,21 @@ int main(void)
         while (sfRenderWindow_pollEvent(window, &event))
         {
             /* Close window : exit */
+			int moving = 0;
             if (event.type == sfEvtClosed)
                 sfRenderWindow_close(window);
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyUp))
+				moving = UP;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyRight))
+				moving = RIGHT;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyDown))
+				moving = DOWN;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyLeft))
+				moving = LEFT;
+			if (moving) {
+				new_request((struct sockaddr *)&servaddr, sockfd, &client_informations.requests, (void*)&moving, ACTIONS);
+				printf("the fuck i'am here\n");
+			}
         }
 			// printf("je rentre enfin%d\n", client_informations.player_id);
 

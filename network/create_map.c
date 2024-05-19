@@ -4,17 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "tools.h"
 
-void free_array(char **array)
-{
-    char **ptr = array;
+// void free_array(char **array)
+// {
+//     char **ptr = array;
 
-    while (*array) {
-        free(*array);
-        array++;
-    }
-    free(ptr);
-}
+//     while (*array) {
+//         free(*array);
+//         array++;
+//     }
+//     free(ptr);
+// }
 
 world_t *instanciate_file(char *file)
 {

@@ -14,18 +14,20 @@ int create_payload(char *payload, void *request, int offset);
 struct response_id_s {
     int len;
     int type;
+    int request_id;
     Response_body body;
 };
 
 struct request_id_s {
     int len;
     int type;
+    int request_id;
     Request_body body;
 };
 
 struct id_object_s {
     int client_id;
-    void (*handle)(struct id_object_s*, struct request_id_s*, struct sockaddr_in*);
+    void (*handle)(struct id_object_s*, struct request_id_s*, struct sockaddr_in*,  world_t *informations);
     void (*response)(struct id_object_s* self, int fd);
     void (*destroy)(struct id_object_s*);
     struct sockaddr_in *client;

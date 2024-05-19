@@ -13,7 +13,7 @@ int new_id(void)
     return id;
 }
 
-static void handle_request(struct id_object_s *self, struct request_id_s *request, struct sockaddr_in *client)
+static void handle_request(struct id_object_s *self, struct request_id_s *request, struct sockaddr_in *client,  world_t *informations)
 {
     self->client = client;
     memcpy(&self->request, request, sizeof(self->request));

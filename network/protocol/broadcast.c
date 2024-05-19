@@ -50,14 +50,14 @@ player_t get_player_position(int client_id, player_t *player_list)
 void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd)
 {
     player_t player = get_player_position(client_id, map->player);
-    struct response_id_s response;
-    memset(&response, 0, sizeof(struct response_id_s));
+    struct response_broadcast_s response;
+    memset(&response, 0, sizeof(struct response_broadcast_s));
     response.type = BROADDCAST;
     response.len = sizeof(response);
 
     char to_send[sizeof(response) + MD5_DIGEST_LENGTH] = {0};
     player_vision(map->map, &player, &response.body, map->player, map->player_count);
-    create_payload(to_send, &response, sizeof(struct response_id_s));
+    create_payload(to_send, &response, sizeof(struct response_broadcast_s));
 
     sendto(fd, to_send, sizeof(to_send), 0, 
 					(struct sockaddr*)client, sizeof(struct sockaddr_in));

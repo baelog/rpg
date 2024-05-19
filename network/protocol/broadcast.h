@@ -7,9 +7,10 @@
 int cipher(void *data, size_t size, unsigned char *digest);
 int create_payload(char *payload, void *request, int offset);
 
-struct response_id_s {
+struct response_broadcast_s {
     int len;
     int type;
+    int request_id;
     Response_body body;
 };
 

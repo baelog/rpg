@@ -4,6 +4,10 @@
         "test": "c",
         "functional": "c",
         "sstream": "c",
-        "yaml.h": "c"
-    }
+        "yaml.h": "c",
+        "clock.h": "c",
+        "riscv_vector.h": "c",
+        "actions.h": "c"
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

@@ -14,6 +14,11 @@ add_executable(client
                 network/md5.c
                 network/create_payload.c           
                 network/tools.c
+                network/client/request.c
+                network/protocol/actions.c
+                network/actions/move_player.c
+                network/player.c
+                network/protocol/request_id.c
                 # yaml.c
                 # read.c
                 # map.c
@@ -31,13 +36,19 @@ add_executable(server
                 network/create_payload.c                
                 network/protocol/id.c
                 network/protocol/broadcast.c
+                network/protocol/actions.c
+                network/client/request.c
+                network/protocol/request_id.c
+                network/tools.c
+                network/player.c
+                network/actions/move_player.c
                 map/ground.c
                 map/wall.c)  # Update with your source files
 
 target_compile_definitions(server PRIVATE SERVER)
-target_link_libraries(server csfml-system crypto)
+target_link_libraries(server csfml-system crypto m)
 # Link the required CSFML libraries to the executable
-target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto)
+target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto m)
 
 # Define the source directory for assets
 set(ASSETS_DIR ${CMAKE_SOURCE_DIR}/assets)  # Update this with your assets directory

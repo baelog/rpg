@@ -59,7 +59,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 {
 	struct type_object_s *(*const create_object[])(int) = {
 		&create_id_object,
-		&create_id_object
+		&create_action_object
 	};
 	struct sockaddr_in cliaddr;
 	socklen_t len = sizeof(cliaddr);
@@ -86,8 +86,8 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 					struct request_s *request = (struct request_s *)buffer;
 					// write(1, "message clear\n", strlen("message clear\n"));
 					// printf("message type ; %d\n", request->type);
-					struct type_object_s *request_handler = create_object[request->type](is_new);
-					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr);
+					struct type_object_s *request_handler = create_object[request->type - 1](is_new);
+					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr, map);
 					request_handler->response(request_handler, udpfd);
 				}
 			}
