@@ -4,6 +4,7 @@
 #include <string.h>
 #include "tools.h"
 #include <stdlib.h>
+#include "./protocol/IResponse.h"
 
 int array_len(void *array)
 {

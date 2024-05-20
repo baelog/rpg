@@ -14,7 +14,7 @@ int new_request(struct sockaddr *server, int fd, waiting_request_t **request_lis
         &create_action_request
     };
     waiting_request_t *new = malloc(sizeof(waiting_request_t));
-    new->request = functions[type](server, fd, information);
+    new->request = functions[type - 2](server, fd, information);
     new->clock = sfClock_create();
     push_back((struct list_s **)request_list, new);
 }

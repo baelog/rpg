@@ -2,13 +2,7 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
-struct IResponse {
-    int len;
-    int type;
-    int request_id;
-    char *body;
-};
-
+typedef struct IResponse IResponse;
 struct list_s {
     struct IResponse *ptr;
     struct list_s *next;

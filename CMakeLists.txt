@@ -15,6 +15,7 @@ add_executable(client
                 network/create_payload.c           
                 network/tools.c
                 network/client/request.c
+                network/client/handle_responce.c
                 network/protocol/actions.c
                 network/actions/move_player.c
                 network/player.c

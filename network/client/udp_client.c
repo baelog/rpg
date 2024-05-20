@@ -23,6 +23,7 @@
 // #include "player.h"
 #include "../tools.h"
 #include "client.h"
+#include <unistd.h>
 
 // #include "types.h"
 
@@ -85,8 +86,8 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 	create_payload(to_send, &request, sizeof(request));
 
 	do {
-	sendto(sockfd, (const char*)to_send, sizeof(to_send), 
-		0, servaddr, servaddr_size);
+		sendto(sockfd, (const char*)to_send, sizeof(to_send), 
+			0, servaddr, servaddr_size);
 	// write(1, "je suis la", strlen("je suis la"));
 	} while (!sleep(5) && !get_message(buffer, sockfd, servaddr));
 
@@ -98,29 +99,6 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 	return response->body.id;
 }
 
-void create_tiles(tiles_t **array, struct response_id_s *response)
-{
-	tiles_t *(*backgroundConstructor[]) (sfVector2f) = {
-		&create_ground, //TODO create the void finction
-		&create_wall,
-		&create_ground
-	};
-	int j = 0;
-	pthread_mutex_lock(&lock);
-
-	for (int i = 0; i != VISION_SIZE && response->body.object[i].type >= 0; i++) {
-		
-		// if (!response->body.object[i].type)
-		// 	printf("player: %d %f %f\n", response->body.object[i].player_type, response->body.object[i].position.x, response->body.object[i].position.y);
-		if (response->body.object[i].type) {
-			// printf("not my type ? %d\n", response->body.object[i].type);
-			array[j++] = backgroundConstructor[response->body.object[i].type](response->body.object[i].position);
-		}
-	}
-	pthread_mutex_unlock(&lock);
-	while (j < VISION_SIZE)
-		array[j++] = NULL;
-}
 
 /**
  * this function is to get message from server
@@ -135,8 +113,11 @@ void *handle_server_connection(void *ptr)
 	if (get_id(args->sockfd, (struct sockaddr *)args->servaddr, buffer, sizeof(struct sockaddr_in), &args->client_informations->player_id) < 0)
 		return 0;
 	
-	if (get_message(buffer, args->sockfd, (struct sockaddr *)args->servaddr)) {
-		create_tiles(args->client_informations->scene_object, (struct response_id_s *)buffer);
+	int is_valide = 0;
+	while (1) {
+		
+		waiting_answer(buffer, args->sockfd, (struct sockaddr *)args->servaddr, args->client_informations);
+
 	}
 }
 
@@ -187,20 +168,30 @@ int main(void)
         while (sfRenderWindow_pollEvent(window, &event))
         {
             /* Close window : exit */
-			int moving = 0;
+			static int moving = 0;
+			int prev = moving;
             if (event.type == sfEvtClosed)
                 sfRenderWindow_close(window);
-			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyUp))
-				moving = UP;
-			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyRight))
-				moving = RIGHT;
-			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyDown))
-				moving = DOWN;
-			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyLeft))
-				moving = LEFT;
-			if (moving) {
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyUp) && !(moving & UP))
+				moving ^= UP;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyRight) && !(moving & RIGHT))
+				moving ^= RIGHT;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyDown) && !(moving & DOWN))
+				moving ^= DOWN;
+			if (event.type == sfEvtKeyPressed && sfKeyboard_isKeyPressed(sfKeyLeft) && !(moving & LEFT))
+				moving ^= LEFT;
+			if (event.type == sfEvtKeyReleased && !sfKeyboard_isKeyPressed(sfKeyUp) && (moving & UP))
+				moving ^= UP;
+			if (event.type == sfEvtKeyReleased && !sfKeyboard_isKeyPressed(sfKeyRight) && (moving & RIGHT))
+				moving ^= RIGHT;
+			if (event.type == sfEvtKeyReleased && !sfKeyboard_isKeyPressed(sfKeyDown) && (moving & DOWN))
+				moving ^= DOWN;
+			if (event.type == sfEvtKeyReleased && !sfKeyboard_isKeyPressed(sfKeyLeft) && (moving & LEFT))
+				moving ^= LEFT;
+			if (moving != prev) {
+				printf("moving %d\n", moving);
 				new_request((struct sockaddr *)&servaddr, sockfd, &client_informations.requests, (void*)&moving, ACTIONS);
-				printf("the fuck i'am here\n");
+				// printf("the fuck i'am here\n");
 			}
         }
 			// printf("je rentre enfin%d\n", client_informations.player_id);

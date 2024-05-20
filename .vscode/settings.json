@@ -7,7 +7,11 @@
         "yaml.h": "c",
         "clock.h": "c",
         "riscv_vector.h": "c",
-        "actions.h": "c"
+        "actions.h": "c",
+        "map.h": "c",
+        "client.h": "c",
+        "iresponse.h": "c",
+        "tools.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

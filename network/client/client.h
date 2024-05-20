@@ -42,5 +42,7 @@ enum move {
 
 int new_request(struct sockaddr *server, int fd, waiting_request_t **request_list, void *information, int type);
 request_t *create_action_request(struct sockaddr *server, int udpfd, void *value);
-
+void create_tiles(tiles_t **array, IResponse *response);
+int get_message(char *buffer, int sockfd, struct sockaddr *servaddr);
+int waiting_answer(char* buffer, int fd, struct sockaddr *servaddr, struct client_information *client_infos);
 #endif /* !CLIENT_H_ */

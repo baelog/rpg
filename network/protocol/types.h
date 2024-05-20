@@ -7,6 +7,7 @@ typedef struct request_s request_t;
 typedef struct type_object_s type_object_t;
 typedef struct world_s world_t;
 typedef struct player_s player_t;
+typedef struct IResponse IResponse;
 
 #define VISION_SIZE 30
 

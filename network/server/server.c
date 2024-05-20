@@ -46,12 +46,13 @@ void remove_array_index(void *array, int index, int len)
 int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cliaddr)
 {
 	int i = 0;
-	for (;client_list[i]; i++) {
+	while (client_list[i] && i < MAX_CLIENTS) {
 		if (client_list[i]->socket->sin_addr.s_addr == cliaddr.sin_addr.s_addr && 
 			client_list[i]->socket->sin_port == cliaddr.sin_port) {
 			return i;
 		}
 	}
+	printf("bien suis que je suis nouveau\n");
 	return 0;
 }
 
@@ -69,9 +70,13 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 		memset(buffer, 0, MAXLINE);
 		ssize_t n = recvfrom(udpfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, &len);
 		int is_new = is_new_client(client_list, cliaddr);
-		if (!is_new && client_count >= MAX_CLIENTS)
+		printf("nev 2 id %d\n", is_new);
+		if (!is_new && client_count >= MAX_CLIENTS) {
+			printf("return ? \n");
 			return;
-		if (!is_new && client_count < MAX_CLIENTS) {
+		}
+		if (!is_new && client_count < MAX_CLIENTS && client_count == is_new) {
+			printf("passage %d\n", client_count);
 			client_list[client_count++] = new_client(cliaddr, map);
 
 		}
@@ -86,14 +91,15 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 					struct request_s *request = (struct request_s *)buffer;
 					// write(1, "message clear\n", strlen("message clear\n"));
 					// printf("message type ; %d\n", request->type);
-					struct type_object_s *request_handler = create_object[request->type - 1](is_new);
+					printf("new id %d\n", is_new);
+					struct type_object_s *request_handler = create_object[request->type - 1](is_new + 1);
 					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr, map);
 					request_handler->response(request_handler, udpfd);
 				}
 			}
 		}
 		if (n < 0) {
-			remove_array_index(client_list, is_new, MAX_CLIENTS);
+			// remove_array_index(client_list, is_new - 1, MAX_CLIENTS);
 		}
 	}
 }
@@ -121,6 +127,7 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 		// printf("%d\n", client_count);
 		// const char* broadcast_message = "Broadcast message from UDP server";
 		for (int i = 0; i < client_count; i++) {
+			printf("the list is not empty\n");
 			broadcast(client_list[i]->socket, client_list[i]->id, map, udpfd);
 
 			// ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
