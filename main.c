@@ -73,7 +73,7 @@
 //                 scene_object[i][j]->print(scene_object[i][j], window);
 //         /* Clear the screen */
 //         /* Update the window */
-//         sfRenderWindow_display(window);
+//         sfRenderWindow_display(wi ndow);
 //         sfRenderWindow_clear(window, sfBlack);
 //     }
 //     /* Cleanup resources */

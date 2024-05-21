@@ -55,7 +55,7 @@ int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 	return 1;
 }
 
-int create_socket(struct sockaddr_in *servaddr)
+int create_socket(struct sockaddr_in *servaddr, char *ip)
 {
 	int sockfd; 
 
@@ -67,7 +67,7 @@ int create_socket(struct sockaddr_in *servaddr)
 	// Filling server information 
 	servaddr->sin_family = AF_INET; 
 	servaddr->sin_port = htons(PORT); 
-	servaddr->sin_addr.s_addr = inet_addr("127.0.0.1");
+	servaddr->sin_addr.s_addr = inet_addr(ip);
 
 	return sockfd;
 }
@@ -129,14 +129,14 @@ void init_client_informations(struct client_information* client_informations)
 	client_informations->requests = NULL;
 }
 
-int main(void) 
+int main(int ac, char **av) 
 { 
 	pthread_t tid;
 	struct sockaddr_in servaddr;
 	struct client_information client_informations;
 	char buffer[MAXLINE];
 
-	int sockfd = create_socket(&servaddr); 
+	int sockfd = create_socket(&servaddr, av[1]); 
 	if (sockfd < 0)
 		return 0;
 	
