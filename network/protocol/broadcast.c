@@ -21,6 +21,7 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
         response_body->object[i].player_type = player->id == player_list[j].id ? 0 : player->id;
         response_body->object[i].type = 0;
         i++;
+        // printf("stuck3");
     }
     for (int j = 0; map[j]; j++) {
         for (int k = 0; map[j][k]; k++) {
@@ -30,6 +31,7 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
                 response_body->object[i].player_type = 0;
                 i++;
             }
+            // printf("stuck\n");
         }
     }
     while (i < VISION_SIZE) {
@@ -41,10 +43,13 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
 
 player_t get_player_position(int client_id, player_t *player_list)
 {
-    for (int i = 0; i != MAX_PLAYER; i++)
+    for (int i = 0; i != MAX_PLAYER; i++) {
         if (player_list[i].id == client_id) {
             return (player_list[i]);
         }
+        // printf("stuck2\n");
+        
+    }
 }
 
 void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd)
