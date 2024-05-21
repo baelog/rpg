@@ -43,12 +43,11 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
 
 player_t get_player_position(int client_id, player_t *player_list)
 {
+    // printf("client id%d\n", client_id);
     for (int i = 0; i != MAX_PLAYER; i++) {
         if (player_list[i].id == client_id) {
             return (player_list[i]);
-        }
-        // printf("stuck2\n");
-        
+        }        
     }
 }
 

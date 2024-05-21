@@ -29,7 +29,7 @@ struct actions_object_s {
     void (*response)(struct actions_object_s* self, int fd);
     void (*destroy)(struct actions_object_s*);
     struct sockaddr_in *client;
-    struct request_actions_s request; 
+    struct request_actions_s request;
     int request_id;
 };
 

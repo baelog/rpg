@@ -12,6 +12,7 @@ int array_len(void *array)
     int i;
 
     for (i = 0; ptr[i]; i++);
+    // printf("je suis mla partie %d\n", i);
     return i;
 }
 

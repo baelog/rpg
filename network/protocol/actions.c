@@ -20,7 +20,7 @@ request_t *create_action_request(struct sockaddr *server, int udpfd, void *value
     request->type = ACTIONS;
     request->len = sizeof(struct request_actions_s);
     request->request_id = generate_request_id();
-    printf("value send %d \n", *action & 0xff);
+    // printf("value send %d \n", *action & 0xff);
     request->body.value = *action & 0xff;
     // printf("int %d\n", request->type);
 
@@ -50,9 +50,11 @@ void read_response(char *buffer, struct waiting_request_s **list)
 static void handle_request(struct actions_object_s *self, struct request_actions_s *request, struct sockaddr_in *client, world_t *informations)
 {
     memcpy(&self->request, request, sizeof(self->request));
+    // printf("player id 22222 %d\n", self->client_id);
     player_t *player = get_player_by_id(self->client_id, informations);
+    // printf("player id 3333 %d\n", self->client_id);
     // printf("%f, %f\n", player->position.y, player->position.x);
-    printf("%d value request\n", self->request.body.value);
+    // printf("%d value request\n", self->request.body.value);
     move_player(player, self->request.body.value);
 
     // printf("%f, %f\n", player->position.y, player->position.x);
@@ -90,7 +92,7 @@ type_object_t *create_action_object(int id)
 {
     struct actions_object_s *object = malloc(sizeof(struct actions_object_s));
 
-    object->client_id = id + 1;
+    object->client_id = id;
     object->handle = &handle_request;
     object->response = &send_response;
     object->destroy = &destroy_self;

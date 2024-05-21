@@ -20,11 +20,11 @@ int move_player(player_t *player, int value)
     if (value & 8)
         direction.y = -1;
     
-    printf("%f, %f\n", player->position.y, player->position.x);
+    // printf("%f, %f\n", player->position.y, player->position.x);
     m = sqrt(direction.x * direction.x + direction.y * direction.y);
     player->position.x += (direction.x / m) * speed;
     player->position.y += (direction.y / m) * speed;
 
-    printf("%f, %f, %f\n", player->position.y, player->position.x, m);
+    // printf("%f, %f, %f\n", player->position.y, player->position.x, m);
     return 0;
 }

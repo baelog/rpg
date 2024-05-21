@@ -8,18 +8,19 @@
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include "server.h"
+#include "../tools.h"
 
 #define PORT 5000  // Port for UDP communication
 #define MAXLINE 1024
 #define MAX_CLIENTS 10
 
-static int array_len(void *array)
+int client_len(struct client **client_list)
 {
-	char **ptr = array;
 	int i = 0;
 
-	while (ptr[i])
+	while (client_list[i])
 		i++;
+	// printf("je usis la %d\n", i);
 	return i;
 }
 
@@ -73,15 +74,16 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 		ssize_t n = recvfrom(udpfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, &len);
 		int is_new = is_new_client(client_list, cliaddr);
 		// printf("nev 2 id %d\n", is_new);
-		if (!is_new && client_count >= MAX_CLIENTS) {
+		if (is_new && client_count >= MAX_CLIENTS) {
 			printf("return ? \n");
 			return;
 		}
-		if (!is_new && client_count < MAX_CLIENTS && client_count == is_new) {
-			printf("passage %d\n", client_count);
+		if (client_count < MAX_CLIENTS && client_count == is_new) {
+			printf("passageeeeeeeeeeeeeeeeeeeeeeeeeee %d\n", client_count);
 			client_list[client_count++] = new_client(cliaddr, map);
 
 		}
+		printf("number of client %d \n", is_new);
 		// write(1, buffer, n);
 		if (n >= 0) {
 			char digest[MD5_DIGEST_LENGTH] = { 0 };
@@ -109,7 +111,8 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], world_t *map) {
 	int nready;
     struct timeval timeout;
-	int client_count = array_len((client_list));
+	int client_count = client_len((client_list));
+	// printf("client count after loop %d \n", client_count);
 
 	FD_ZERO(rset);
 	FD_SET(udpfd, rset);
@@ -133,6 +136,7 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 		// const char* broadcast_message = "Broadcast message from UDP server";
 		for (int i = 0; i < client_count; i++) {
 			// printf("the list is not empty\n");
+			// printf("client id %d\n", client_list[i]->id);
 			broadcast(client_list[i]->socket, client_list[i]->id, map, udpfd);
 
 			// ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
@@ -144,6 +148,8 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 
 			// }
 		}
+			// printf("\n");
+
 	}
 }
 
