@@ -48,7 +48,7 @@ type_object_t *create_id_object(int id)
     struct id_object_s *object = malloc(sizeof(struct id_object_s));
 
     object->client_id = id;
-    printf("new client %d\n", id);
+    // printf("new client %d\n", id);
     object->handle = &handle_request;
     object->response = &send_response;
     object->destroy = &destroy_self;

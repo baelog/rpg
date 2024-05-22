@@ -55,7 +55,7 @@ int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cl
 		}
 		i++;
 	}
-	printf("bien suis que je suis nouveau\n");
+	// printf("bien suis que je suis nouveau\n");
 	return i;
 }
 
@@ -83,7 +83,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 			client_list[client_count++] = new_client(cliaddr, map);
 
 		}
-		printf("number of client %d \n", is_new);
+		// printf("number of client %d \n", is_new);
 		// write(1, buffer, n);
 		if (n >= 0) {
 			char digest[MD5_DIGEST_LENGTH] = { 0 };

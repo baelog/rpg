@@ -7,19 +7,26 @@
 #include <stdio.h>
 #include "../tools.h"
 
-void create_tiles(tiles_t **array, IResponse *response)
+void create_tiles(tiles_t **array, player_t **players, IResponse *response)
 {
 	tiles_t *(*backgroundConstructor[]) (sfVector2f) = {
 		&create_ground, //TODO create the void finction
 		&create_wall,
 		&create_ground
 	};
+	player_t *(*create_players[]) (sfVector2f, int) = {
+		&create_other_player,
+		&create_me
+	};
 	int j = 0;
+	int k = 0;
 	pthread_mutex_lock(&lock);
 
 	for (int i = 0; i != VISION_SIZE && response->body.object[i].type >= 0; i++) {
-		// if (!response->body.object[i].type)
-		// 	printf("player: %d %f %f\n", response->body.object[i].player_type, response->body.object[i].position.x, response->body.object[i].position.y);
+		if (!response->body.object[i].type) {
+			players[k++] = create_players[response->body.object[i].player_type == 0](response->body.object[i].position, response->body.object[i].player_type);
+			// printf("player: %d %f %f\n", response->body.object[i].player_type, response->body.object[i].position.x, response->body.object[i].position.y);
+		}
 		if (response->body.object[i].type) {
 			// printf("not my type ? %d\n", response->body.object[i].type);
 			array[j++] = backgroundConstructor[response->body.object[i].type](response->body.object[i].position);
@@ -39,7 +46,7 @@ int waiting_answer(char* buffer, int fd, struct sockaddr *servaddr, struct clien
         // printf("je suis dans cette boucle\n");
         struct IResponse *response = (struct IResponse*)buffer;
         if (response->type == BROADDCAST)
-            create_tiles(client_infos->scene_object, response);
+            create_tiles(client_infos->scene_object, client_infos->players, response);
         if (response->type == ACTIONS) {
             // player_t *player = get_player_by_id(client_infos->player_id, infos);
             // move_player(player, response->body->)

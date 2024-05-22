@@ -31,7 +31,7 @@ typedef struct player_s {
     sfVector2f position;
 #ifndef SERVER
     sfSprite *spirte;
-    void (*print)(struct tiles_s*, sfRenderWindow*);
+    void (*print)(struct player_s*, sfRenderWindow*);
 #endif
     void *on_colide;
     void *on_destroy;
@@ -46,6 +46,9 @@ typedef struct world_s {
 
 tiles_t *create_ground(sfVector2f);
 tiles_t *create_wall(sfVector2f);
+
+player_t *create_other_player(sfVector2f pos, int id);
+player_t *create_me(sfVector2f pos, int id);
 
 tiles_t ***create_scene_object(grid_t*);
 char **handle_file(char*);

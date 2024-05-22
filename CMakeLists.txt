@@ -24,6 +24,8 @@ add_executable(client
                 # read.c
                 # map.c
                 map/ground.c
+                map/player_other.c
+                map/player.c
                 map/wall.c)  # Update with your source files
 
 add_executable(server

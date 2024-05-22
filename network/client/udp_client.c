@@ -203,6 +203,8 @@ int main(int ac, char **av)
 			// }
 			for (int i = 0; client_informations.scene_object[i] && i < VISION_SIZE; i++)
 				client_informations.scene_object[i]->print(client_informations.scene_object[i], window);
+			for (int i = 0; client_informations.players[i] && i < MAX_PLAYER; i++)
+				client_informations.players[i]->print(client_informations.players[i], window);
 			/* Clear the screen */
 			/* Update the window */
 			sfRenderWindow_display(window);
