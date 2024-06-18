@@ -13,9 +13,8 @@ int new_id(void)
     return id;
 }
 
-static void handle_request(struct id_object_s *self, struct request_id_s *request, struct sockaddr_in *client,  world_t *informations)
+static void handle_request(struct id_object_s *self, struct request_id_s *request,  world_t *informations)
 {
-    self->client = client;
     memcpy(&self->request, request, sizeof(self->request));
 }
 
@@ -33,7 +32,7 @@ static void send_response(struct id_object_s* self, int udpfd)
     create_payload(to_send, &response, sizeof(struct response_id_s));
 
     sendto(udpfd, to_send, sizeof(to_send), 0, 
-					(struct sockaddr*)self->client, sizeof(*self->client));
+					get_client_socket(self->client), sizeof(struct sockaddr_in));
 
     self->destroy(self);
 }
@@ -43,11 +42,12 @@ static void destroy_self(struct id_object_s* self)
     free(self);
 }
 
-type_object_t *create_id_object(int id)
+type_object_t *create_id_object(int id, struct client *cli)
 {
     struct id_object_s *object = malloc(sizeof(struct id_object_s));
 
     object->client_id = id;
+    object->client = cli;
     // printf("new client %d\n", id);
     object->handle = &handle_request;
     object->response = &send_response;

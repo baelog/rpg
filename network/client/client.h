@@ -34,10 +34,10 @@ struct thread_args {
 };
 
 enum move {
-    UP = 1,
-    RIGHT = 2,
-    DOWN = 4,
-    LEFT = 8
+    RIGHT = 1,
+    DOWN = 2,
+    LEFT = 4,
+    UP = 8
 };
 
 int new_request(struct sockaddr *server, int fd, waiting_request_t **request_list, void *information, int type);

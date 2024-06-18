@@ -141,6 +141,7 @@ int main(int ac, char **av)
 		return 0;
 	
 	init_client_informations(&client_informations);
+	pthread_mutex_init(&lock, NULL);
 
 	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr};
 	pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
@@ -214,6 +215,7 @@ int main(int ac, char **av)
     /* Cleanup resources */
     sfRenderWindow_destroy(window);
 	pthread_join(tid, NULL);
-	close(sockfd); 
+	// pthread_exit(NULL);
+	close(sockfd);
 	return 0; 
 } 

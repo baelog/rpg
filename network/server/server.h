@@ -5,10 +5,12 @@
 
 // #include "protocol/types.h"
 #include <SFML/System/Vector2.h>
+#include <SFML/System/Clock.h>
 #include <openssl/md5.h>
 #include "../protocol/types.h"
 
 #define VISION_SIZE 30
+#define MAX_CLIENTS 10
 
 typedef struct world_s world_t;
 
@@ -47,12 +49,20 @@ struct response_s {
 
 struct client {
     int id;
+    int state;
+    int prev_state;
     struct sockaddr_in *socket;
+    sfClock *clock;
 };
+
+typedef struct server_information_s {
+    sfClock *clock;
+    struct client *client_list[MAX_CLIENTS + 1];
+} server_information_t;
 
 struct type_object_s {
     int client_id;
-    void (*handle)(struct type_object_s *self, struct request_s*, struct sockaddr_in*, world_t *informations);
+    void (*handle)(struct type_object_s *self, struct request_s*, world_t *informations);
     void (*response)(struct type_object_s* self, int fd);
     void (*destroy)(struct type_object_s*);
 };
@@ -62,8 +72,8 @@ int cipher(void *data, size_t size, char *digest);
 world_t *instanciate_file(char *file);
 
 void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd);
-struct type_object_s *create_id_object(int);
-type_object_t *create_action_object(int id);
+struct type_object_s *create_id_object(int, struct client *cli);
+type_object_t *create_action_object(int id, struct client *cli);
 struct client *new_client(struct sockaddr_in client, world_t *world_information);
 
 #endif /* !SERVER_H_ */

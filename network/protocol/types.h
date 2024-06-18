@@ -8,6 +8,8 @@ typedef struct type_object_s type_object_t;
 typedef struct world_s world_t;
 typedef struct player_s player_t;
 typedef struct IResponse IResponse;
+typedef struct client client_t;
+typedef struct sockaddr_in sockaddr_in;
 
 #define VISION_SIZE 30
 

@@ -20,6 +20,7 @@ add_executable(client
                 network/actions/move_player.c
                 network/player.c
                 network/protocol/request_id.c
+                network/network_tools.c
                 # yaml.c
                 # read.c
                 # map.c
@@ -45,6 +46,7 @@ add_executable(server
                 network/tools.c
                 network/player.c
                 network/actions/move_player.c
+                network/network_tools.c
                 map/ground.c
                 map/wall.c)  # Update with your source files
 

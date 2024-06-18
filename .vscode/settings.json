@@ -12,7 +12,9 @@
         "client.h": "c",
         "iresponse.h": "c",
         "tools.h": "c",
-        "vector2.h": "c"
+        "vector2.h": "c",
+        "socket.h": "c",
+        "server.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

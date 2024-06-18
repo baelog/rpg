@@ -9,10 +9,11 @@
 #include <arpa/inet.h>
 #include "server.h"
 #include "../tools.h"
+#include <SFML/System/Time.h>
 
 #define PORT 5000  // Port for UDP communication
 #define MAXLINE 1024
-#define MAX_CLIENTS 10
+
 
 int client_len(struct client **client_list)
 {
@@ -61,7 +62,7 @@ int is_new_client(struct client *client_list[MAX_CLIENTS], struct sockaddr_in cl
 
 void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], int client_count, world_t *map)
 {
-	struct type_object_s *(*const create_object[])(int) = {
+	struct type_object_s *(*const create_object[])(int, struct client*) = {
 		&create_id_object,
 		&create_action_object
 	};
@@ -79,7 +80,7 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 			return;
 		}
 		if (client_count < MAX_CLIENTS && client_count == is_new) {
-			printf("passageeeeeeeeeeeeeeeeeeeeeeeeeee %d\n", client_count);
+			// printf("passageeeeeeeeeeeeeeeeeeeeeeeeeee %d\n", client_count);
 			client_list[client_count++] = new_client(cliaddr, map);
 
 		}
@@ -96,8 +97,8 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 					// write(1, "message clear\n", strlen("message clear\n"));
 					// printf("message type ; %d\n", request->type);
 					// printf("new id %d\n", is_new);
-					struct type_object_s *request_handler = create_object[request->type - 1](is_new + 1);
-					request_handler->handle(request_handler, request, (struct sockaddr_in*)&cliaddr, map);
+					struct type_object_s *request_handler = create_object[request->type - 1](is_new + 1, client_list[is_new]);
+					request_handler->handle(request_handler, request, map);
 					request_handler->response(request_handler, udpfd);
 				}
 			}
@@ -108,10 +109,10 @@ void read_client(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS
 	}
 }
 
-int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS], world_t *map) {
+int server_loop(int udpfd, fd_set *rset, server_information_t *server_info, world_t *map) {
 	int nready;
     struct timeval timeout;
-	int client_count = client_len((client_list));
+	int client_count = client_len(server_info->client_list);
 	// printf("client count after loop %d \n", client_count);
 
 	FD_ZERO(rset);
@@ -119,7 +120,7 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 
 	// Set a timeout to periodically send broadcast messages to clients
 	timeout.tv_sec = 0;  // Broadcast every 10 seconds
-	timeout.tv_usec = 1000000;
+	timeout.tv_usec = 100000;
 
 	// printf("nev 2 id fffffffffffffffffffffffff\n");
 
@@ -128,16 +129,19 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 	// printf("nev 2 id fffffffffffffffffffffffff2222222222\n");
 	if (nready > 0) {
 		// If the UDP socket is readable, receive the message
-		read_client(udpfd, rset, client_list, client_count, map);
+		read_client(udpfd, rset, server_info->client_list, client_count, map);
 		
-	} else {
+	}
+
+	sfTime time = sfClock_getElapsedTime(server_info->clock);
+	if (time.microseconds > 1000000) {
 		// Broadcast a message to all clients in the list
 		// printf("%d\n", client_count);
 		// const char* broadcast_message = "Broadcast message from UDP server";
 		for (int i = 0; i < client_count; i++) {
 			// printf("the list is not empty\n");
 			// printf("client id %d\n", client_list[i]->id);
-			broadcast(client_list[i]->socket, client_list[i]->id, map, udpfd);
+			broadcast(server_info->client_list[i]->socket, server_info->client_list[i]->id, map, udpfd);
 
 			// ssize_t n =  sendto(udpfd, broadcast_message, strlen(broadcast_message), 0, 
 			// 		(struct sockaddr*)client_list[i], sizeof(*(client_list[i])));
@@ -149,8 +153,18 @@ int server_loop(int udpfd, fd_set *rset, struct client *client_list[MAX_CLIENTS]
 			// }
 		}
 			// printf("\n");
-
+		sfClock_restart(server_info->clock);
 	}
+}
+
+
+server_information_t init_server_info(void)
+{
+	server_information_t server_info;
+
+	memset(&server_info.client_list, 0, sizeof(server_info.client_list));
+	server_info.clock = sfClock_create();
+	return server_info;
 }
 
 int main() {
@@ -162,7 +176,7 @@ int main() {
     int nready;
 
     // List of clients for broadcasting
-    struct client *client_list[MAX_CLIENTS + 1] = { NULL };
+	server_information_t server_info = init_server_info();
     int client_count = 0;
 
     // Create UDP socket
@@ -181,7 +195,7 @@ int main() {
     // Main loop
     while (1) {
 		// printf("je suis par la\n");
-		server_loop(udpfd, &rset, client_list, map);
+		server_loop(udpfd, &rset, &server_info, map);
     }
 
     close(udpfd);
