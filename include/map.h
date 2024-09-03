@@ -3,6 +3,7 @@
 #define MAP_H_
 
 #include <SFML/System/Vector2.h>
+#include <SFML/System/Clock.h>
 #include <SFML/Graphics/Types.h>
 
 #define MAX_PLAYER 10
@@ -33,13 +34,16 @@ typedef struct player_s {
     sfSprite *spirte;
     void (*print)(struct player_s*, sfRenderWindow*);
 #endif
+    sfClock *clock;
     void *on_colide;
+    void (*move)(struct player_s*);
     void *on_destroy;
     int id;
+    int state;
 }player_t;
 
 typedef struct world_s {
-    player_t player[MAX_PLAYER];
+    player_t *player[MAX_PLAYER];
     tiles_t ***map;
     int player_count;
 }world_t;

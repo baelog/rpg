@@ -13,12 +13,12 @@ int is_in_range(sfVector2f v1, sfVector2f v2)
     return (((vx * vx) + (vy * vy)) < 10000);
 }
 
-void player_vision(tiles_t ***map, player_t *player, Response_body *response_body, player_t *player_list, int nb_player)
+void player_vision(tiles_t ***map, player_t *player, Response_body *response_body, player_t **player_list, int nb_player)
 {
     int i = 0;
     for (int j = 0; j != nb_player; j++) {
-        response_body->object[i].position = player_list[j].position;
-        response_body->object[i].player_type = player->id == player_list[j].id ? 0 : player->id;
+        response_body->object[i].position = player_list[j]->position;
+        response_body->object[i].player_type = player->id == player_list[j]->id ? 0 : player->id;
         response_body->object[i].type = 0;
         i++;
         // printf("stuck3");
@@ -41,11 +41,11 @@ void player_vision(tiles_t ***map, player_t *player, Response_body *response_bod
 }
 
 
-player_t get_player_position(int client_id, player_t *player_list)
+player_t *get_player_position(int client_id, player_t **player_list)
 {
     // printf("client id%d\n", client_id);
     for (int i = 0; i != MAX_PLAYER; i++) {
-        if (player_list[i].id == client_id) {
+        if (player_list[i]->id == client_id) {
             return (player_list[i]);
         }        
     }
@@ -53,14 +53,14 @@ player_t get_player_position(int client_id, player_t *player_list)
 
 void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd)
 {
-    player_t player = get_player_position(client_id, map->player);
+    player_t *player = get_player_position(client_id, map->player);
     struct response_broadcast_s response;
     memset(&response, 0, sizeof(struct response_broadcast_s));
     response.type = BROADDCAST;
     response.len = sizeof(response);
 
     char to_send[sizeof(response) + MD5_DIGEST_LENGTH] = {0};
-    player_vision(map->map, &player, &response.body, map->player, map->player_count);
+    player_vision(map->map, player, &response.body, map->player, map->player_count);
     create_payload(to_send, &response, sizeof(struct response_broadcast_s));
 
     sendto(fd, to_send, sizeof(to_send), 0, 

@@ -3,10 +3,11 @@
 #include <math.h>
 #include <stdio.h>
 
-int move_player(player_t *player, int value)
+int move_player(player_t *player, int value, int time)
 {
     sfVector2f direction = {0, 0};
-    double speed = .8;
+    double speed = (double)time / (double)30000;
+    printf("%f\n", speed);
     double m;
 
     if (!value)

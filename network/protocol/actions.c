@@ -52,9 +52,11 @@ static void handle_request(struct actions_object_s *self, struct request_actions
     memcpy(&self->request, request, sizeof(self->request));
     // printf("player id 22222 %d\n", self->client_id);
     player_t *player = get_player_by_id(self->client_id, informations);
+
     // printf("player id 3333 %d\n", self->client_id);
     // printf("%f, %f\n", player->position.y, player->position.x);
     // printf("%d value request\n", self->request.body.value);
+    set_player_state(player, self->request.body.value, 0xF);
     move_player(player, self->request.body.value);
 
     // printf("%f, %f\n", player->position.y, player->position.x);

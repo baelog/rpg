@@ -13,23 +13,22 @@ static void on_destroy(void) {
 
 }
 
-int create_player(player_t *new_player, tiles_t ***map, int id)
+int create_player(player_t **new_player, tiles_t ***map, int id)
 {
-    new_player->id = id;
-    new_player->on_colide = &on_colide;
-    new_player->on_destroy = &on_destroy;
-
     for (int i = 0; map[i]; i++) {
         for (int j = 0; map[i][j]; j++) {
             // printf("je tourne\n");
             if (map[i][j]->spawn) {
                 // printf("ici la victoire %f, %f\n", map[i][j]->position.x, map[i][j]->position.y);
-                new_player->position = (sfVector2f){map[i][j]->position.x, map[i][j]->position.y};
+                *new_player = create_me((sfVector2f){map[i][j]->position.x, map[i][j]->position.y}, id);
+                // new_player->position = (sfVector2f){map[i][j]->position.x, map[i][j]->position.y};
                 return 0;
             }
         }
     }
-    new_player->position = (sfVector2f){0, 0};
+    *new_player = create_me((sfVector2f){0, 0}, id);
+
+    // new_player->position = (sfVector2f){0, 0};
     return 1;
 }
 

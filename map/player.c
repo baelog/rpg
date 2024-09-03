@@ -1,6 +1,7 @@
 #include "player.h"
 #include "../include/map.h"
 #include <stdlib.h>
+#include "../network/actions/all_action.h"
 #ifndef SERVER
 #include <SFML/Graphics/RenderWindow.h>
 #include <SFML/Graphics/Image.h>
@@ -31,6 +32,12 @@ static int get_type(void)
     return 2;
 }
 
+static void move(struct my_s *player)
+{
+    sfTime time = sfClock_getElapsedTime(player->clock);
+    move_player(player, player->state & 0xF, time.microseconds & 0xFFFFFFFF);
+    sfClock_restart(player->clock);
+}
 
 player_t *create_me(sfVector2f pos, int id)
 {
@@ -57,8 +64,11 @@ player_t *create_me(sfVector2f pos, int id)
     player->spirte = sprite;
     player->print = &print;
     #endif
+    player->clock = sfClock_create();
+    player->state = 0;
     player->position = pos;
     player->on_colide = &on_colide;
+    player->move = &move;
     player->on_destroy = &on_destroy;
     // player->get_type = &get_type;
     player->id = id;

@@ -27,6 +27,6 @@ world_t *instanciate_file(char *file)
     // free_array(map);
     world->map = scene_object;
     world->player_count = 0;
-    memset(world->player, 0, sizeof(player_t) * 10);
+    memset(world->player, 0, sizeof(player_t*) * MAX_PLAYER);
     return world;
 }

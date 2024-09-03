@@ -27,10 +27,11 @@ add_executable(client
                 map/ground.c
                 map/player_other.c
                 map/player.c
-                map/wall.c)  # Update with your source files
+                map/wall.c)
 
 add_executable(server
                 network/server/server.c
+                network/server/update.c
                 network/server/new_connection.c
                 yaml.c
                 read.c
@@ -48,7 +49,8 @@ add_executable(server
                 network/actions/move_player.c
                 network/network_tools.c
                 map/ground.c
-                map/wall.c)  # Update with your source files
+                map/wall.c
+                map/player.c)
 
 target_compile_definitions(server PRIVATE SERVER)
 target_link_libraries(server csfml-system crypto m)

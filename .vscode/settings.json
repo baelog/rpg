@@ -14,7 +14,9 @@
         "tools.h": "c",
         "vector2.h": "c",
         "socket.h": "c",
-        "server.h": "c"
+        "server.h": "c",
+        "player.h": "c",
+        "all_action.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

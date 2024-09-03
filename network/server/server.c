@@ -10,6 +10,7 @@
 #include "server.h"
 #include "../tools.h"
 #include <SFML/System/Time.h>
+#include "../player.h"
 
 #define PORT 5000  // Port for UDP communication
 #define MAXLINE 1024
@@ -133,6 +134,8 @@ int server_loop(int udpfd, fd_set *rset, server_information_t *server_info, worl
 		
 	}
 
+	update_players_positions(map);
+	
 	sfTime time = sfClock_getElapsedTime(server_info->clock);
 	if (time.microseconds > 1000000) {
 		// Broadcast a message to all clients in the list

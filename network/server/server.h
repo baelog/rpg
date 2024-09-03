@@ -75,5 +75,6 @@ void broadcast(struct sockaddr_in *client, int client_id, world_t* map, int fd);
 struct type_object_s *create_id_object(int, struct client *cli);
 type_object_t *create_action_object(int id, struct client *cli);
 struct client *new_client(struct sockaddr_in client, world_t *world_information);
+void update_players_positions(world_t *map);
 
 #endif /* !SERVER_H_ */
