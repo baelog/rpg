@@ -31,6 +31,7 @@ struct thread_args {
     struct client_information* client_informations;
     int sockfd;
     struct sockaddr_in *servaddr;
+    char is_client_alive;
 };
 
 enum move {

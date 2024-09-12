@@ -121,7 +121,7 @@ int server_loop(int udpfd, fd_set *rset, server_information_t *server_info, worl
 
 	// Set a timeout to periodically send broadcast messages to clients
 	timeout.tv_sec = 0;  // Broadcast every 10 seconds
-	timeout.tv_usec = 100000;
+	timeout.tv_usec = 10000;
 
 	// printf("nev 2 id fffffffffffffffffffffffff\n");
 
@@ -137,7 +137,7 @@ int server_loop(int udpfd, fd_set *rset, server_information_t *server_info, worl
 	update_players_positions(map);
 	
 	sfTime time = sfClock_getElapsedTime(server_info->clock);
-	if (time.microseconds > 1000000) {
+	if (time.microseconds > 100000) {
 		// Broadcast a message to all clients in the list
 		// printf("%d\n", client_count);
 		// const char* broadcast_message = "Broadcast message from UDP server";

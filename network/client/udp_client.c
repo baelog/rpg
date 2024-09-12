@@ -114,11 +114,12 @@ void *handle_server_connection(void *ptr)
 		return 0;
 	
 	int is_valide = 0;
-	while (1) {
+	while (args->is_client_alive) {
 		
 		waiting_answer(buffer, args->sockfd, (struct sockaddr *)args->servaddr, args->client_informations);
 
 	}
+	return NULL;
 }
 
 void init_client_informations(struct client_information* client_informations)
@@ -143,7 +144,7 @@ int main(int ac, char **av)
 	init_client_informations(&client_informations);
 	pthread_mutex_init(&lock, NULL);
 
-	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr};
+	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr, 1};
 	pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
 	// if (get_id(sockfd, (struct sockaddr *)&servaddr, buffer, sizeof(servaddr)) < 0)
 	// 	return 0;
@@ -212,6 +213,7 @@ int main(int ac, char **av)
 			sfRenderWindow_clear(window, sfBlack);
 		}
     }
+	args.is_client_alive = 0;
     /* Cleanup resources */
     sfRenderWindow_destroy(window);
 	pthread_join(tid, NULL);
