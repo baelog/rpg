@@ -1,8 +1,16 @@
 #include "broadcast.h"
-#include <arpa/inet.h>
 #include "../../include/map.h"
 #include <string.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+	#include <io.h>
+	#include <windows.h>
+	#define access _access
+
+#else
+	#include <unistd.h>
+    #include <arpa/inet.h>
+#endif
 
 int is_in_range(sfVector2f v1, sfVector2f v2)
 {

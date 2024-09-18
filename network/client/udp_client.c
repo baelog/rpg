@@ -1,36 +1,64 @@
 // UDP client program 
-#include <arpa/inet.h> 
-#include <netinet/in.h> 
+// #include <arpa/inet.h> 
+
+#ifdef _WIN32
+	#include <io.h>
+	// #include <windows.h>
+	#include <WS2tcpip.h>
+	#include <Windows.h>
+	#include <process.h>
+	#define access _access
+    typedef signed long long int ssize_t;
+
+	HANDLE  lock;
+
+#else
+	#include <netinet/in.h> 
+	#include <pthread.h>
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <sys/time.h>
+
+	pthread_mutex_t lock;
+#endif
+
 #include <stdio.h> 
 #include <stdlib.h> 
-#include <strings.h> 
-#include <sys/socket.h> 
+// #include <strings.h> 
+// #include <sys/socket.h> 
 #include <sys/types.h> 
 #include <string.h>
 #include "../protocol/id.h"
-#include <arpa/inet.h>
+// #include <arpa/inet.h>
 #include <openssl/md5.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include <SFML/Graphics/RenderWindow.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <unistd.h>
 #include "../../include/read.h"
 #include "../../include/window.h"
 #include "../../include/map.h"
 #include "../../include/yaml.h"
-#include <pthread.h>
 // #include "player.h"
 #include "../tools.h"
 #include "client.h"
-#include <unistd.h>
-
+// #include <unistd.h>
 // #include "types.h"
 
 #define PORT 5000 
 #define MAXLINE 1024
 
-pthread_mutex_t lock;
+
+
+#ifdef _WIN32
+
+int sleep(int milliseconds) {
+    Sleep(milliseconds*1000);
+    return 0;
+}
+#endif
 
 int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 {
@@ -42,7 +70,7 @@ int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 					&len);
 
 	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
-		printf("bad message len\n");
+		printf("bad message len %lld\n", n, sizeof(struct response_id_s) + sizeof(digest));
 		return 0;
 	}
 
@@ -58,8 +86,27 @@ int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 int create_socket(struct sockaddr_in *servaddr, char *ip)
 {
 	int sockfd; 
+	#ifdef _WIN32
+		WSADATA wsaData;
+		if( WSAStartup(MAKEWORD(2,2), &wsaData) != 0){
 
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
+			printf("Client: WSAStartup failed with error %ld\n", WSAGetLastError());
+
+			// Clean up
+			WSACleanup();
+
+			// Exit with error
+			return -1;
+		}
+		else{
+			printf("Client: The Winsock DLL status is %s.\n", wsaData.szSystemStatus);
+		}
+		sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	#else
+		sockfd = socket(AF_INET, SOCK_DGRAM, 0))
+	#endif
+
+	if (sockfd < 0) { 
 		return -1;
 	}
 
@@ -88,13 +135,20 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 	do {
 		sendto(sockfd, (const char*)to_send, sizeof(to_send), 
 			0, servaddr, servaddr_size);
+		printf("je reste stuck ici\n");
 	// write(1, "je suis la", strlen("je suis la"));
 	} while (!sleep(5) && !get_message(buffer, sockfd, servaddr));
 
 	response = (struct response_id_s*)buffer;
-	pthread_mutex_lock(&lock);
-	*id = response->body.id;
-	pthread_mutex_unlock(&lock); 
+	#ifdef _WIN32
+		WaitForSingleObject(lock, INFINITE);
+		*id = response->body.id;
+		ReleaseMutex(lock);
+	#else
+		pthread_mutex_lock(&lock);
+		*id = response->body.id;
+		pthread_mutex_unlock(&lock); 
+	#endif
 	// printf("my id %d", id);
 	return response->body.id;
 }
@@ -115,10 +169,12 @@ void *handle_server_connection(void *ptr)
 	
 	int is_valide = 0;
 	while (1) {
-		
 		waiting_answer(buffer, args->sockfd, (struct sockaddr *)args->servaddr, args->client_informations);
-
 	}
+	#ifdef _WIN32
+		_endthreadex( 0 );
+	#endif
+	return NULL;
 }
 
 void init_client_informations(struct client_information* client_informations)
@@ -130,21 +186,38 @@ void init_client_informations(struct client_information* client_informations)
 }
 
 int main(int ac, char **av) 
-{ 
-	pthread_t tid;
+{
+	#ifdef _WIN32
+		HANDLE  hThread;
+		unsigned threadID;
+	#else
+		pthread_t tid;
+	#endif
+
 	struct sockaddr_in servaddr;
 	struct client_information client_informations;
 	char buffer[MAXLINE];
 
-	int sockfd = create_socket(&servaddr, av[1]); 
-	if (sockfd < 0)
+	int sockfd = create_socket(&servaddr, "127.0.0.1");
+	if (sockfd < 0) {
+		printf("je suis la\n");
 		return 0;
+	}
 	
 	init_client_informations(&client_informations);
-	pthread_mutex_init(&lock, NULL);
+	#ifdef _WIN32
+		lock = CreateMutex(NULL, FALSE, NULL);
+	#else
+		pthread_mutex_init(&lock, NULL);
+	#endif
 
 	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr};
-	pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
+	#ifdef _WIN32
+		// hThread = (HANDLE)_beginthread(handle_server_connection, 0, (void *)&args);
+		hThread = (HANDLE)_beginthreadex(NULL, 0, &handle_server_connection, &args, 0, &threadID);
+	#else
+		pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 
+	#endif
 	// if (get_id(sockfd, (struct sockaddr *)&servaddr, buffer, sizeof(servaddr)) < 0)
 	// 	return 0;
 	// struct response_id_s *response = (struct response_id_s*)buffer;
@@ -214,7 +287,12 @@ int main(int ac, char **av)
     }
     /* Cleanup resources */
     sfRenderWindow_destroy(window);
-	pthread_join(tid, NULL);
+	#ifdef _WIN32
+		WaitForSingleObject( hThread, INFINITE );
+		CloseHandle( hThread );
+	#else
+		pthread_join(tid, NULL);
+	#endif
 	// pthread_exit(NULL);
 	close(sockfd);
 	return 0; 

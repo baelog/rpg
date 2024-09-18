@@ -4,9 +4,17 @@
 #define IRESPONSE_H_
 
 #include "../protocol/types.h"
-#include <pthread.h>
+#ifdef _WIN32
+	#include <io.h>
+	#include <windows.h>
+	#define access _access
 
-extern pthread_mutex_t lock;
+    extern HANDLE lock;
+#else
+    #include <pthread.h>
+    extern pthread_mutex_t lock;
+#endif
+
 
 struct IResponse {
     int len;

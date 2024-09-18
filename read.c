@@ -1,6 +1,18 @@
+#ifdef _WIN32
+	#include <io.h>
+	// #include <windows.h>
+	#include <WS2tcpip.h>
+	#define access _access
+	
+	typedef signed long long int ssize_t;
+    typedef long int __off_t;
+#else
+
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -62,9 +74,12 @@ void read_file(char *file, char *buffer, __off_t size) {
 char **handle_file(char *file)
 {
     __off_t size = file_size(file);
-    char buffer[size];
+    char *buffer = malloc(sizeof(char) * size);
 
     read_file(file, buffer, size);
     // write(1, buffer, strlen(buffer));
-    return create_array(buffer);
+    char **array = create_array(buffer);
+    
+    free(buffer);
+    return array;
 }

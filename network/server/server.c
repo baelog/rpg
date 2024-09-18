@@ -1,12 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
+#ifdef _WIN32
+	#include <io.h>
+	// #include <windows.h>
+	#include <WS2tcpip.h>
+	#define access _access
+	
+	typedef signed long long int ssize_t;
+#else
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <sys/time.h>
+#endif
+
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
 #include "server.h"
 #include "../tools.h"
 #include <SFML/System/Time.h>
@@ -183,7 +192,22 @@ int main() {
     int client_count = 0;
 
     // Create UDP socket
-    udpfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	#ifdef _WIN32
+		WSADATA wsaData;
+		if( WSAStartup(MAKEWORD(2,2), &wsaData) != 0){
+
+			printf("Server: WSAStartup failed with error: %ld\n", WSAGetLastError());
+
+			return -1;
+		}
+		else{
+				printf("Server: The Winsock DLL status is: %s.\n", wsaData.szSystemStatus);
+		}
+		udpfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	#else
+		udpfd = socket(AF_INET, SOCK_DGRAM, 0))
+	#endif
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
@@ -193,7 +217,7 @@ int main() {
     // Bind the socket to the address and port
     bind(udpfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
 
-	world_t *map = instanciate_file("./assets/map/scene1.yaml");
+	world_t *map = instanciate_file("../assets/map/scene1.yaml");
 	
     // Main loop
     while (1) {

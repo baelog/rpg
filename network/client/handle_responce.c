@@ -3,7 +3,7 @@
 #include "../player.h"
 #include "client.h"
 #include "../actions/all_action.h"
-#include <unistd.h>
+// #include <unistd.h>
 #include <stdio.h>
 #include "../tools.h"
 
@@ -20,7 +20,12 @@ void create_tiles(tiles_t **array, player_t **players, IResponse *response)
 	};
 	int j = 0;
 	int k = 0;
-	pthread_mutex_lock(&lock);
+
+	#ifdef _WIN32
+		WaitForSingleObject(lock, INFINITE);
+	#else
+		pthread_mutex_lock(&lock);
+	#endif
 
 	for (int i = 0; i != VISION_SIZE && response->body.object[i].type >= 0; i++) {
 		if (!response->body.object[i].type) {
@@ -32,7 +37,13 @@ void create_tiles(tiles_t **array, player_t **players, IResponse *response)
 			array[j++] = backgroundConstructor[response->body.object[i].type](response->body.object[i].position);
 		}
 	}
-	pthread_mutex_unlock(&lock);
+	
+	#ifdef _WIN32
+		ReleaseMutex(lock);
+	#else
+		pthread_mutex_unlock(&lock); 
+	#endif
+	
 	while (j < VISION_SIZE)
 		array[j++] = NULL;
 }

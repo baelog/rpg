@@ -3,7 +3,41 @@ cmake_minimum_required(VERSION 3.16)
 # Project name and version
 project(MyCSFMLProject VERSION 1.0)
 
-set(CMAKE_PREFIX_PATH "usr/local/lib/")
+IF (WIN32)
+    set(CMAKE_PREFIX_PATH "C:/lib")
+    IF (WIN32)
+    add_library(csfml-system STATIC IMPORTED)
+    set_target_properties(csfml-system PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/CSFML/include"
+        IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/CSFML/lib/msvc/csfml-system.lib"
+    )
+    add_library(csfml-window STATIC IMPORTED)
+    set_target_properties(csfml-window PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/CSFML/include"
+        IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/CSFML/lib/msvc/csfml-window.lib"
+    )
+    add_library(csfml-graphics STATIC IMPORTED)
+    set_target_properties(csfml-graphics PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/CSFML/include"
+        IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/CSFML/lib/msvc/csfml-graphics.lib"
+    )
+    add_library(csfml-audio STATIC IMPORTED)
+    set_target_properties(csfml-audio PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/CSFML/include"
+        IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/CSFML/lib/msvc/csfml-audio.lib"
+    )
+
+    add_library(crypto STATIC IMPORTED)
+    set_target_properties(crypto PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/OpenSSL-Win64/include"
+        IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/OpenSSL-Win64/lib/VC/x64/MD/libcrypto.lib"
+    )
+ENDIF()
+  # set stuff for windows
+ELSE()
+  # set stuff for other systems
+  set(CMAKE_PREFIX_PATH "usr/local/lib/")
+ENDIF()
 # Find the CSFML package
 # find_package(CSFML 2.5.2 REQUIRED COMPONENTS system window graphics audio network)
 
@@ -53,9 +87,21 @@ add_executable(server
                 map/player.c)
 
 target_compile_definitions(server PRIVATE SERVER)
-target_link_libraries(server csfml-system crypto m)
+
+target_link_libraries(server csfml-system crypto)
 # Link the required CSFML libraries to the executable
-target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto m)
+target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto)
+
+
+IF (WIN32)
+  target_link_libraries(server Ws2_32.lib)
+  target_link_libraries(client Ws2_32.lib)
+ENDIF()
+
+IF (NOT WIN32)
+  target_link_libraries(server m)
+  target_link_libraries(client m)
+ENDIF()
 
 # Define the source directory for assets
 set(ASSETS_DIR ${CMAKE_SOURCE_DIR}/assets)  # Update this with your assets directory

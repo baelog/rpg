@@ -1,6 +1,7 @@
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 
+typedef unsigned char __u_char;
 /**
  * deprecated one
 */

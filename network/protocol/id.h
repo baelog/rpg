@@ -4,8 +4,20 @@
 
 #include "types.h"
 // #include <openssl/md5.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+// #include <sys/socket.h>
+// #include <arpa/inet.h>
+#ifdef _WIN32
+	#include <io.h>
+	#include <windows.h>
+	#define access _access
+    typedef unsigned char __u_char;
+
+#else
+	// #include <unistd.h>
+	#include <arpa/inet.h>
+	#include <sys/socket.h>
+	// #include <sys/time.h>
+#endif
 
 typedef struct sockaddr_in sockaddr_in;
 

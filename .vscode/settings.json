@@ -16,7 +16,10 @@
         "socket.h": "c",
         "server.h": "c",
         "player.h": "c",
-        "all_action.h": "c"
+        "all_action.h": "c",
+        "stdlib.h": "c",
+        "windows.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

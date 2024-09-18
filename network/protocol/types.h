@@ -34,7 +34,7 @@ enum type {
     ID,
     ACTIONS,
     INVENTARY,
-    ERROR
+    _ERROR
 };
 
 #endif /* !TYPES_H_ */
