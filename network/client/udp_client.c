@@ -10,7 +10,7 @@
 	#define access _access
     typedef signed long long int ssize_t;
 
-	HANDLE  lock;
+	HANDLE lock;
 
 #else
 	#include <netinet/in.h> 
@@ -62,14 +62,19 @@ int sleep(int milliseconds) {
 
 int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 {
-	int len = 0;
+	int len = sizeof(struct sockaddr_in);
 	unsigned char digest[MD5_DIGEST_LENGTH];
 
 	ssize_t n = recvfrom(sockfd, (char*)buffer, MAXLINE, 
 					0, servaddr, 
 					&len);
-
+	if (n < 0) {
+		int errorCode = WSAGetLastError();
+    	printf("recvfrom failed with error: %d\n", errorCode);
+		return 0;
+	}
 	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
+		
 		printf("bad message len %lld\n", n, sizeof(struct response_id_s) + sizeof(digest));
 		return 0;
 	}
@@ -102,6 +107,8 @@ int create_socket(struct sockaddr_in *servaddr, char *ip)
 			printf("Client: The Winsock DLL status is %s.\n", wsaData.szSystemStatus);
 		}
 		sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		// setsockopt(sockfd, IPPROTO_UDP, SO_RCVBUF, (char *)&recvBufferSize, sizeof(recvBufferSize));
+
 	#else
 		sockfd = socket(AF_INET, SOCK_DGRAM, 0))
 	#endif
@@ -137,7 +144,7 @@ int get_id(int sockfd, struct sockaddr *servaddr, char *buffer, int servaddr_siz
 			0, servaddr, servaddr_size);
 		printf("je reste stuck ici\n");
 	// write(1, "je suis la", strlen("je suis la"));
-	} while (!sleep(5) && !get_message(buffer, sockfd, servaddr));
+	} while (sleep(5) || get_message(buffer, sockfd, servaddr) <= 0);
 
 	response = (struct response_id_s*)buffer;
 	#ifdef _WIN32
@@ -163,6 +170,25 @@ void *handle_server_connection(void *ptr)
 {
 	struct thread_args *args = ptr;
 	char buffer[MAXLINE];
+	printf("sockfd1 : %d\n", args->sockfd);
+	// #ifdef _WIN32
+	// 	WSADATA wsaData;
+	// 	if( WSAStartup(MAKEWORD(2,2), &wsaData) != 0){
+
+	// 		printf("Client: WSAStartup failed with error %ld\n", WSAGetLastError());
+
+	// 		// Clean up
+	// 		WSACleanup();
+
+	// 		// Exit with error
+	// 		return -1;
+	// 	}
+	// 	else{
+	// 		printf("Client thread: The Winsock DLL status is %s.\n", wsaData.szSystemStatus);
+	// 	}
+	// 	// setsockopt(sockfd, IPPROTO_UDP, SO_RCVBUF, (char *)&recvBufferSize, sizeof(recvBufferSize));
+
+	// #endif
 
 	if (get_id(args->sockfd, (struct sockaddr *)args->servaddr, buffer, sizeof(struct sockaddr_in), &args->client_informations->player_id) < 0)
 		return 0;
@@ -214,6 +240,7 @@ int main(int ac, char **av)
 	struct thread_args args = {&client_informations, sockfd, (void*)&servaddr};
 	#ifdef _WIN32
 		// hThread = (HANDLE)_beginthread(handle_server_connection, 0, (void *)&args);
+		printf("sockfd0 : %d\n", args.sockfd);
 		hThread = (HANDLE)_beginthreadex(NULL, 0, &handle_server_connection, &args, 0, &threadID);
 	#else
 		pthread_create(&tid, NULL, handle_server_connection, (void *)&args); 

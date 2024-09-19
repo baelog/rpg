@@ -17,6 +17,7 @@ tiles_t ***create_scene_object(grid_t *scene)
     int j = 0;
     
     for (i = 0; i != scene->row_count; i++) {
+        printf("nb\n");
         pos.x = 0;
         scene_object[i] = malloc(sizeof(tiles_t*) * (scene->rows[i]->column_count + 1));
         for (j = 0; j != scene->rows[i]->column_count; ++j) {
