@@ -1,5 +1,13 @@
 #include "server.h"
-#include <arpa/inet.h>
+#ifdef _WIN32
+	#include <io.h>
+	#include <windows.h>
+	#define access _access
+
+#else
+	#include <unistd.h>
+    #include <arpa/inet.h>
+#endif
 #include "../../include/map.h"
 #include <string.h>
 #include <stdlib.h>

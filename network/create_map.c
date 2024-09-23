@@ -20,7 +20,7 @@
 world_t *instanciate_file(char *file)
 {
     world_t *world = malloc(sizeof(world_t));
-    char **map = handle_file("./assets/map/scene1.yaml");
+    char **map = handle_file(file);
     grid_t scene = create_scene(map);
     tiles_t ***scene_object = create_scene_object(&scene);
     

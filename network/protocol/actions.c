@@ -1,12 +1,19 @@
 #include "actions.h"
 #include "../tools.h"
 #include <openssl/md5.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
 #include "../player.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#ifdef _WIN32
+	#include <io.h>
+	#include <windows.h>
+	#define access _access
+
+#else
+    #include <sys/socket.h>
+    #include <arpa/inet.h>
+#endif
 
 
 request_t *create_action_request(struct sockaddr *server, int udpfd, void *value)
