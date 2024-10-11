@@ -19,7 +19,8 @@
         "all_action.h": "c",
         "stdlib.h": "c",
         "windows.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "ws2bth.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

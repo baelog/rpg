@@ -86,6 +86,9 @@ add_executable(server
                 map/wall.c
                 map/player.c)
 
+add_executable(BTTest
+                network/client/bluetooth.c)
+
 target_compile_definitions(server PRIVATE SERVER)
 
 target_link_libraries(server csfml-system crypto)
@@ -96,6 +99,7 @@ target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audi
 IF (WIN32)
   target_link_libraries(server Ws2_32.lib)
   target_link_libraries(client Ws2_32.lib)
+  target_link_libraries(BTTest Ws2_32.lib) # test
 ENDIF()
 
 IF (NOT WIN32)
