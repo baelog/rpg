@@ -20,12 +20,11 @@ int main()
         NULL  // hTemplate must be NULL for comm devices.
         );
         
-    if (hDevID == INVALID_HANDLE_VALUE)
-    {    printf("CreateFile() failed\n");
+    if (hDevID == INVALID_HANDLE_VALUE) {
+        printf("CreateFile() failed\n");
         return -1;
 
-    }else
-    {
+    } else {
         printf("CreateFile() succeeded\n");
     }
 
@@ -33,11 +32,12 @@ int main()
     DCB dcb; // Structure defining port options.
     memset(&dcb, 0, sizeof(DCB)); // this function puts zero to all the memoris pointed by dcb
                                 // so dcb initialized by all zero
-    if (!GetCommState(hDevID, &dcb)) // now dcb is filled by all the port option
-    {
+    if (!GetCommState(hDevID, &dcb)) {
         printf("GetCommState() failed\n");
         return -1;
     }
+    // we can change some options for example
+    dcb.BaudRate = 9600 ;
     printf("baud rate = %d\n",dcb.BaudRate);
     printf("Parity = %d\n",dcb.Parity);
     printf("Byte Size = %d\n",dcb.ByteSize);
@@ -46,8 +46,6 @@ int main()
     // ONE5STOPBITS    1
     // TWOSTOPBITS    2
     
-    // we can change some options for example
-    dcb.BaudRate = 9600 ;
     // so we must apply these new parameters
         if (!SetCommState(hDevID, &dcb))
     {
@@ -84,9 +82,9 @@ int main()
     int i = 0;
 //    if we want to read an entire buffer :
 //    memset(readbuf, 0, BUFFER_SIZE); // Fill the buffer of 0 (to erase any previous read data).
-    readbuflen = 10; // We expect for examle 10 bytes
-    readbytes = 0;
-    nbbytes = 0;
+    // readbuflen = 10; // We expect for examle 10 bytes
+    // readbytes = 0;
+    // nbbytes = 0;
     char buffer[BUFFER_SIZE] = { 0 };
 
     // The number of bytes that are sent and we will receive might not be
@@ -122,8 +120,7 @@ int main()
     //------------------------------------------------------------------------------------------------------
 
     // Close the COM4 serial port.
-    if (!CloseHandle(hDevID))
-    {
+    if (!CloseHandle(hDevID)) {
         printf("CloseHandle() failed\n");
         return -1;
     }
