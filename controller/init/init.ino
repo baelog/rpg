@@ -31,8 +31,8 @@ void setup() {
 
 void loop() {
     loopBT();
-    loopJoystick();
-    loopGyro();
+    // loopJoystick();
+    // loopGyro();
     if (digitalRead(8) == LOW) {  // Button pressed (pin is connected to GND)
         Serial.println("Button is pressed");
     } else {  // Button not pressed (pin is pulled to HIGH by the pull-up resistor)

@@ -12,8 +12,8 @@ enum architechture {
 };
 
 typedef struct DataHeader {
-    __int16 arc;
-    __int16 size;
+    int16_t arc;
+    int16_t size;
 }DataHeader;
 
 typedef struct Data{
@@ -21,13 +21,9 @@ typedef struct Data{
     float joystickX;
     float joystickY;
     char button[BUFFER_LEN];
-    __int16 gx;
-    __int16 gy;
-    __int16 gz;
+    int16_t gx;
+    int16_t gy;
+    int16_t gz;
     char arc; // specify the architecture of the sender
     char crc;
 }Data;
-
-#define a sizeof(Data);
-#define a sizeof(DataHeader);
-#define a sizeof(float);

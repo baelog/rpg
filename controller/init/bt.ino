@@ -18,15 +18,18 @@ void loopBT() {
         Serial.print((char)SerialBT.read());
     }
     memset(&data, 0, sizeof(Data));
-    data.arc = PIC8;
-    data.size = sizeof(Data);
-    data.size = sizeof(__int16);
-    loopButton(data.playload1);
+    data.header.arc = PIC8;
+    data.header.size = sizeof(Data);
+    // data.size = sizeof(int16_t);
+    Serial.print("size of the structure ");
+    Serial.println(sizeof(Data));
+    loopButton(data.button);
     loopGyro(&data.gx, &data.gy, &data.gz);
+    loopJoystick(&data.joystickX, &data.joystickY);
     // loopButton(data.playload2);
     // loopButton(data.playload3);
     SerialBT.write((char*)&data, sizeof(Data));
-    // delay(10);
+    delay(4000);
     // if (divide) {
     //     SerialBT.write(buff, sizeof(buff), );
     // } else {
@@ -53,6 +56,6 @@ void loopButton(char *payload) {
         }
         Serial.println(buttonState);
         
-        delay(100);  // Delay for better readability in the Serial Monitor
+        // delay(100);  // Delay for better readability in the Serial Monitor
     }
 }

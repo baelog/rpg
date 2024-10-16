@@ -16,16 +16,16 @@ void setupGyro() {
     
 }
 
-void loopGyro(__int16 *gx, __int16 *gy, __int16 *gz) {
+void loopGyro(int16_t *gx, int16_t *gy, int16_t *gz) {
 
     mpu.getMotion6(&ax, &ay, &az, gx, gy, gz);
     
     Serial.print("Accel X: "); Serial.println(ax);
     Serial.print(" Accel Y: "); Serial.println(ay);
     Serial.print(" Accel Z: "); Serial.println(az);
-    Serial.print(" Gyro X: "); Serial.println(gx);
-    Serial.print(" Gyro Y: "); Serial.println(gy);
-    Serial.print(" Gyro Z: "); Serial.println(gz);
+    Serial.print(" Gyro X: "); Serial.println(*gx);
+    Serial.print(" Gyro Y: "); Serial.println(*gy);
+    Serial.print(" Gyro Z: "); Serial.println(*gz);
     
     // delay(1000);
 }

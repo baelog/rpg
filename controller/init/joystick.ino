@@ -10,18 +10,17 @@ void setupJoystick()
     digitalWrite(BP7, HIGH); // Activation de la résistance de Pull-Up
 }
 
-void loopJoystick()
+void loopJoystick(float *x, float *y)
 {
-    float X, Y;
     int Bouton;
-    X = analogRead (axeX) * (5.0 / 1023.0);
-    Y = analogRead (axeY) * (5.0 / 1023.0);
+    *x = analogRead (axeX) * (5.0 / 1023.0);
+    *y = analogRead (axeY) * (5.0 / 1023.0);
     Bouton = digitalRead (BP7);
     Serial.print("Axe X:");
-    Serial.print(X, 4);
+    Serial.print(*x, 4);
     Serial.print("V, ");
     Serial.print("Axe Y:");
-    Serial.print(Y, 4);
+    Serial.print(*y, 4);
     Serial.print("V, ");
     Serial.print("Bouton:");
     if (Bouton==1) {

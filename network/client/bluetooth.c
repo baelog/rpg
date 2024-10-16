@@ -3,6 +3,7 @@
 // Main Win32 API header.
 #include < windows.h >
 
+#include "bluetooth.h"
 #define BUFFER_SIZE 256
 
       
@@ -11,7 +12,7 @@ int main()
     HANDLE hDevID = INVALID_HANDLE_VALUE; // Identifier of the serial port.
                                         // by default fix at -1 (INVALID_HANDLE_VALUE)
     hDevID = CreateFile( // open the serial port
-        "\\\\.\\COM5",
+        "\\\\.\\COM13",
         GENERIC_READ | GENERIC_WRITE,
         0,    // Must be opened with exclusive-access.
         NULL, // No security attributes.
@@ -106,9 +107,9 @@ int main()
             printf("ReadFile() failed\n");
             return -1;
         }
-        memset(buffer, 0, sizeof(buffer));
+        // memset(buffer, 0, sizeof(buffer));
         // readbytes += nbbytes; // here nbbytes is alwayes equal to 1
-        printf("%x, %d\n",*readbuf, nbbytes); // print the read caracters on the screen
+        printf("%d, %d\n", sizeof(Data), nbbytes); // print the read caracters on the screen
         // buffer[i++]=readbuf; // save the string in a buffer
         // printf("%s\n",buffer);
     }
