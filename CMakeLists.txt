@@ -85,12 +85,19 @@ add_executable(server
                 map/ground.c
                 map/wall.c
                 map/player.c)
+                
+add_executable(test
+                network/client/combat.c
+)
 
 target_compile_definitions(server PRIVATE SERVER)
 
 target_link_libraries(server csfml-system crypto)
 # Link the required CSFML libraries to the executable
 target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto)
+
+## test
+target_link_libraries(test csfml-system csfml-window csfml-graphics csfml-audio crypto m)
 
 
 IF (WIN32)
