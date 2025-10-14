@@ -1,6 +1,14 @@
-#include ".gitignore"/
+#include "component.h"
 
-int handle_component(IComponent *component)
-{
-    return 0;
+struct Component *createComponent(struct Component *list, int type, void *data) {
+    struct Component *new = malloc(sizeof(struct Component));
+
+    if (!new)
+        return (list);
+
+    new->next = list;
+    new->type = type;
+    new->data = data;
+
+    return new;
 }

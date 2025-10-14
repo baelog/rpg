@@ -4,7 +4,7 @@
 
 #include "../network/protocol/types.h"
 
-enum Status_effect {
+enum StatusEffect {
     POISON,
     REGENERATION,
     STUN,
@@ -13,13 +13,22 @@ enum Status_effect {
 };
 
 struct IStatus {
-    Status_effect effect;
+    enum StatusEffect effect;
     int duration;
 };
 
 struct IComponent {
-    void (*action)(void* client, player_t *player, IStatus status);
+    void (*action)(void* client, player_t *player, struct IStatus *status);
+};
 
+enum ComponentType {
+    HIYBOX
+};
+
+struct Component {
+    int type;
+    void *data;
+    struct Component *next;
 };
 
 #endif /* !COMPONENT_H_ */

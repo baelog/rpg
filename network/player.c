@@ -11,7 +11,7 @@ player_t *get_player_by_id(int client_id, world_t *infos)
     return *(infos->player);
 }
 
-player_t *get_player_list(world_t *infos)
+player_t **get_player_list(world_t *infos)
 {
     return infos->player;
 }

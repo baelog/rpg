@@ -1,12 +1,17 @@
 #include "wall.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "hitbox/hitbox.h"
+#include "sprite/sprite.h"
 #ifndef SERVER
 #include <SFML/Graphics/RenderWindow.h>
 #include <SFML/Graphics/Image.h>
 #include <SFML/Graphics/Texture.h>
 #include <SFML/Graphics/Sprite.h>
+
+#define WALL_SPRITE_PATH "./assets/images/wall2.png"
 #endif
+#define WALL_HITBOX_PATH "./assets/images/wall.tri"
 
 static void on_colide(void)
 {
@@ -39,25 +44,26 @@ tiles_t *create_wall(sfVector2f pos)
     static sfSprite *sprite = NULL;
     static sfTexture* texture = NULL;
     
-    if (!texture) {
-        sfImage *image = sfImage_create(50, 50);
-        // if (!image) {
-        //     write(1, "error can't create image\n", strlen("error can't create image\n"));
-        //     // exit(0);
-        // }
-        for (unsigned int x = 0; x < 50; x++) {
-            for (unsigned int y = 0; y < 50; y++)
-                sfImage_setPixel(image, x, y, sfRed);
-    }
-    texture = sfTexture_create(50, 50);
-    sfTexture_updateFromImage(texture, image, 0, 0);
+    createSprite(WALL_SPRITE_PATH, &texture, &sprite, (sfIntRect){0, 0, 50, 50});
+    // if (!texture) {
+    //     sfImage *image = sfImage_create(50, 50);
+    //     // if (!image) {
+    //     //     write(1, "error can't create image\n", strlen("error can't create image\n"));
+    //     //     // exit(0);
+    //     // }
+    //     for (unsigned int x = 0; x < 50; x++) {
+    // w.tri"        for (unsigned int y = 0; y < 50; y++)
+    //             sfImage_setPixel(image, x, y, sfRed);
+    // }
+    // texture = sfTexture_create(50, 50);
+    // sfTexture_updateFromImage(texture, image, 0, 0);
 
-    }
-    if (!sprite) {
-        sprite = sfSprite_create();
+    // }
+    // if (!sprite) {
+    //     sprite = sfSprite_create();
         
-        sfSprite_setTexture(sprite, texture, sfFalse);
-    }
+    //     sfSprite_setTexture(sprite, texture, sfFalse);
+    // }
     wall->spirte = sprite;
     wall->print = &print;
     #endif

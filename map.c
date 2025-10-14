@@ -2,7 +2,7 @@
 #include "include/yaml.h"
 #include <stdlib.h>
 #include <stddef.h>
-
+#include <stdio.h>
 
 tiles_t ***create_scene_object(grid_t *scene)
 {

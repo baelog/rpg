@@ -7,6 +7,8 @@
 #include <SFML/Graphics/Types.h>
 #include <SFML/Graphics/Sprite.h>
 
+#include "hitbox/hitbox.h"
+
 typedef struct tiles_s tiles_t;
 
 

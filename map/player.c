@@ -3,15 +3,18 @@
 #include <stdlib.h>
 #include "../network/actions/all_action.h"
 #ifndef SERVER
+#include "sprite/sprite.h"
 #include <SFML/Graphics/RenderWindow.h>
 #include <SFML/Graphics/Image.h>
-#include <SFML/Graphics/Texture.h>
-#include <SFML/Graphics/Sprite.h>
+// #include <SFML/Graphics/Texture.h>
+// #include <SFML/Graphics/Sprite.h>
+#define PLAYER_SPRITE_PATH "./assets/images/player.png"
 #endif
+#define PLAYER_HITBOX_PATH "./assets/images/player.tri"
 
 static void on_colide(void)
 {
-
+    
 }
 
 static void print(struct my_s *self, sfRenderWindow *window)
@@ -35,7 +38,7 @@ static int get_type(void)
 static void move(struct my_s *player)
 {
     sfTime time = sfClock_getElapsedTime(player->clock);
-    move_player(player, player->state & 0xF, time.microseconds & 0xFFFFFFFF);
+    move_player((player_t *)player, player->state & 0xF, time.microseconds & 0xFFFFFFFF);
     sfClock_restart(player->clock);
 }
 
@@ -44,27 +47,28 @@ player_t *create_me(sfVector2f pos, int id)
     struct my_s *player = malloc(sizeof(struct my_s));
     #ifndef SERVER
     static sfSprite *sprite = NULL;
-    static sfTexture* texture = NULL;
+    static sfTexture *texture = NULL;
 
+    createSprite(PLAYER_SPRITE_PATH, &texture, &sprite, (sfIntRect){0,0, 50,50});
     
-    if (!texture) {
-        sfImage *image = sfImage_create(50, 50);
-        for (unsigned int x = 0; x < 50; x++) {
-            for (unsigned int y = 0; y < 50; y++)
-                sfImage_setPixel(image, x, y, sfBlue);
-        }
-        texture = sfTexture_create(50, 50);
-        sfTexture_updateFromImage(texture, image, 0, 0);
+    // if (!texture) {
+    //     sfImage *image = sfImage_create(50, 50);
+    //     for (unsigned int x = 0; x < 50; x++) {
+    //         for (unsigned int y = 0; y < 50; y++)
+    //             sfImage_setPixel(image, x, y, sfBlue);
+    //     }
+    //     texture = sfTexture_create(50, 50);
+    //     sfTexture_updateFromImage(texture, image, 0, 0);
 
-    }
-    if (!sprite) {
-        sprite = sfSprite_create(); 
-        sfSprite_setTexture(sprite, texture, sfFalse);
-    }
+    // }
+    // if (!sprite) {
+    //     sprite = sfSprite_create(); 
+    //     sfSprite_setTexture(sprite, texture, sfFalse);
+    // }
     player->spirte = sprite;
     player->print = &print;
     #endif
-    player->clock = sfClock_create();
+    player->clock =     sfClock_create();
     player->state = 0;
     player->position = pos;
     player->on_colide = &on_colide;

@@ -7,7 +7,7 @@
 	typedef signed long long int ssize_t;
     typedef long int __off_t;
 #else
-
+    #include <unistd.h>
 #endif
 
 #include <stdlib.h>

@@ -78,7 +78,7 @@ int get_message(char *buffer, int sockfd, struct sockaddr *servaddr)
 	}
 	if (n != sizeof(struct response_id_s) + sizeof(digest)) {
 		
-		printf("bad message len %lld\n", n, sizeof(struct response_id_s) + sizeof(digest));
+		printf("bad message len %ld\n, %ld\n", n, sizeof(struct response_id_s) + sizeof(digest));
 		return 0;
 	}
 

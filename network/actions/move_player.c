@@ -25,7 +25,6 @@ int move_player(player_t *player, int value, int time)
     m = sqrt(direction.x * direction.x + direction.y * direction.y);
     player->position.x += (direction.x / m) * speed;
     player->position.y += (direction.y / m) * speed;
-
-    // printf("%f, %f, %f\n", player->position.y, player->position.x, m);
+    printf("%f, %f, %f\n", player->position.y, player->position.x, m);
     return 0;
 }

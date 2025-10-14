@@ -19,7 +19,15 @@
         "all_action.h": "c",
         "stdlib.h": "c",
         "windows.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "renderwindow.h": "c",
+        "hitbox.h": "c",
+        "id.h": "c",
+        "cstdlib": "c",
+        "new": "c",
+        "typeinfo": "c",
+        "message.h": "c",
+        "testpackets.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
