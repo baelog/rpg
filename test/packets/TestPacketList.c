@@ -1,15 +1,7 @@
 #include "unity.h"
 #include "../../network/protocol/message.h"
+#include "testPackets.h"
 
-int countPacket(struct packetList *packets) {
-	int i = 0;
-
-	while (packets) {
-		packets = packets->next;
-		i++;
-	}
-	return i;
-}
 
 void test_PacketsAdd(void) {
 	struct packetList *packets = NULL;

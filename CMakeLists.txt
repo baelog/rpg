@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.16)
 # Project name and version
 project(MyCSFMLProject VERSION 1.0)
 
+option(BUILD_TESTS "Build test programs" OFF)
+
+
 IF (WIN32)
     set(CMAKE_PREFIX_PATH "C:/lib")
     IF (WIN32)
@@ -32,7 +35,7 @@ IF (WIN32)
         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_PREFIX_PATH}/OpenSSL-Win64/include"
         IMPORTED_LOCATION "${CMAKE_PREFIX_PATH}/OpenSSL-Win64/lib/VC/x64/MD/libcrypto.lib"
     )
-ENDIF()
+    ENDIF()
   # set stuff for windows
 ELSE()
   # set stuff for other systems
@@ -88,6 +91,10 @@ add_executable(server
                 map/wall.c
                 map/player.c
                 map/hitbox/hitbox.c)
+
+IF (BUILD_TESTS)
+  add_subdirectory(test)
+endif()
                 
 # add_executable(test
 #                 network/client/combat.c
@@ -99,9 +106,10 @@ target_link_libraries(server csfml-system crypto)
 # Link the required CSFML libraries to the executable
 target_link_libraries(client csfml-system csfml-window csfml-graphics csfml-audio crypto)
 
+
+
 ## test
 # target_link_libraries(test csfml-system csfml-window csfml-graphics csfml-audio crypto m)
-
 
 IF (WIN32)
   target_link_libraries(server Ws2_32.lib)

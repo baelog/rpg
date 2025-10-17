@@ -62,11 +62,11 @@ int insertPacket(struct packetList **packets, struct packet *pckt)
 	
 	// printf("je passe ici a un moment\n");
 	while (ac && ac->packet->packetID != pckt->packetID) {
-		printf("insert: %d\n", ac->packet->packetID);
+		// printf("insert: %d\n", ac->packet->packetID);
 		prev = ac;
 		ac = ac->next;
 	}
-	printf("\n");
+	// printf("\n");
 
 	//maybe insert it oon the middle
 	if (!ac)
@@ -79,7 +79,8 @@ struct sequences *createSequences(struct sequences **sq, struct packet *pckt)
 	struct sequences *new = malloc(sizeof(struct sequences));
 	if (!new)
 		return NULL;
-		
+	
+	// printf("pckt->sequenceID : %d\n", pckt->sequenceID);
 	new->packetNumber = pckt->packetNb;
 	new->sequenceID = pckt->sequenceID;
 	new->packets = NULL;
@@ -114,19 +115,27 @@ int addToPlace(struct sequences **sq, struct packet *pckt)
 	struct sequences *act = *sq;
 	struct sequences *prev = *sq;
 	
-	if (!sq) {
-		*sq = createSequences(sq, pckt);
+	struct packetList *packets;
+	if (!*sq) {
+		createSequences(sq, pckt);
 		act = *sq;
+		if (!act) {
+			// printf("pas de création\n");
+			return 0;
+		}
 	}
-	while (act && act->packetNumber != pckt->sequenceID) {
+
+	// printf("sequence id :%d\n", act->sequenceID);
+	while (act && act->sequenceID != pckt->sequenceID) {
 		prev = act;
 		act = act->next;
+		// printf("loop\n");
 	}
 	//maybe insert it oon the middle
 	if (!act)
-		prev->next = createSequences(sq, pckt);
+		act = createSequences(sq, pckt);
 
-	createPacket(&act->packets, pckt);
+	insertPacket(&act->packets, pckt);
 	return 0;
 }
 

@@ -22,8 +22,10 @@ void tearDown(void)
 
 int main(void)
 {
-  UnityBegin("add.c");
-  RUN_TEST(test_PacketsAdd, 20);
+  UnityBegin("MaincTest.c");
+  RUN_TEST(test_PacketsAdd, __LINE__);
+
+  RUN_TEST(test_SequencesCreate, __LINE__);
 
   return (UnityEnd());
 }
