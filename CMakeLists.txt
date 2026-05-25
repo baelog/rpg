@@ -25,9 +25,12 @@ FetchContent_MakeAvailable(Catch2)
 set (CMAKE_CXX_FLAGS -fpermissive)
 
 add_executable(server
-    src/main.cpp
     src/network/packetStackHandler.cpp
     src/network/tools/MD5.cpp
+    src/server/Client.cpp
+    src/server/main.cpp
+    src/server/newConnection.cpp
+    src/map/Player.cpp
 )
 target_compile_features(server PRIVATE cxx_std_17)
 target_link_libraries(server PRIVATE SFML::Graphics OpenSSL::Crypto)
