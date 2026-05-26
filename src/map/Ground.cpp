@@ -1,11 +1,12 @@
-#include "Player.hpp"
+#include "Ground.hpp"
+
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-sf::Texture *Player::_texture = NULL;
-sf::Sprite *Player::_sprite = NULL;
+sf::Texture *Ground::_texture = NULL;
+sf::Sprite *Ground::_sprite = NULL;
 
-Player::Player(sf::Vector2f &position, int &id) : _position(position), _id(id), _state(0), _clock()
+Ground::Ground(sf::Vector2f &position) : _position(position)
 {
     #ifndef SERVER
     
@@ -39,13 +40,13 @@ Player::Player(sf::Vector2f &position, int &id) : _position(position), _id(id), 
     // player->id = id;
 }
 
-Player::~Player()
+Ground::~Ground()
 {
     delete _sprite;
     delete _texture;
 }
 
-void Player::print(sf::RenderWindow *window)
+void Ground::print(sf::RenderWindow *window)
 {
     window->draw(*_sprite);
 }

@@ -1,11 +1,12 @@
-#include "Player.hpp"
+#include "Wall.hpp"
+
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-sf::Texture *Player::_texture = NULL;
-sf::Sprite *Player::_sprite = NULL;
+sf::Texture *Wall::_texture = NULL;
+sf::Sprite *Wall::_sprite = NULL;
 
-Player::Player(sf::Vector2f &position, int &id) : _position(position), _id(id), _state(0), _clock()
+Wall::Wall(sf::Vector2f &position) : _position(position)
 {
     #ifndef SERVER
     
@@ -39,13 +40,13 @@ Player::Player(sf::Vector2f &position, int &id) : _position(position), _id(id), 
     // player->id = id;
 }
 
-Player::~Player()
+Wall::~Wall()
 {
     delete _sprite;
     delete _texture;
 }
 
-void Player::print(sf::RenderWindow *window)
+void Wall::print(sf::RenderWindow *window)
 {
     window->draw(*_sprite);
 }

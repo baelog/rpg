@@ -1,15 +1,17 @@
-#ifndef PLAYER
-#define PLAYER
+
+#ifndef GROUND_H_
+#define GROUND_H_
 
 #include <SFML/System/Vector2.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <SFML/System/Clock.hpp>
 
-#include "IPlayer.hpp"
+#include "IObject.hpp"
 
-class Player: public IPlayer {
+
+
+struct Ground : public IObject {
     private:
 
         // sf::Image *image;
@@ -17,17 +19,15 @@ class Player: public IPlayer {
         static sf::Texture *_texture;
         static sf::Sprite *_sprite;
     #endif
-        sf::Clock _clock;
-        int _id;
-        int _state;
+        int _type;
         sf::Vector2f _position;
         
     public:
         
         // void *on_colide;
         // void *on_destroy;
-        Player(sf::Vector2f &position, int &id);
-        ~Player();
+        Ground(sf::Vector2f &position);
+        ~Ground();
         // void (*move)(struct my_s*);
         #ifndef SERVER
         void print(sf::RenderWindow *window);
