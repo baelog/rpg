@@ -6,7 +6,7 @@
 
 #define MAX_ENTITIES 20 //TODO later
 
-#define ComponantValue uint32_t
+#define ComponentValue uint32_t
 #define Entity uint32_t
 #define ComponentSignature uint32_t
 
